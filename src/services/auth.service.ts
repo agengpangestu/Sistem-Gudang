@@ -5,7 +5,7 @@ import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library"
 import UserType from "../types/user.type"
 
 class AuthService {
-  public async Register(payload: Omit<AuthRegisterType, "id,name">): Promise<AuthRegisterType> {
+  public async Register(payload: Omit<AuthRegisterType, "id">): Promise<AuthRegisterType | any> {
     try {
       return await prismaUtils.prisma.user.create({ data: payload })
     } catch (error: any) {
