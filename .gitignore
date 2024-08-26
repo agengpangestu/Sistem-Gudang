@@ -17,3 +17,6 @@ dist
 #mist
 DS_Store
 package-lock.json
+
+#any
+.vscode
