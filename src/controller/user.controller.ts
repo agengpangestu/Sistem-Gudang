@@ -35,7 +35,7 @@ class UserController {
     try {
       if (error) {
         console.log(error)
-        logger.error(`ERR: auth - register = ${error.message}`)
+        logger.error(`ERR: auth - update = ${error.message}`)
         return res.status(422).send({ status: false, statusCode: 422, message: error.message.replace(/\"/g, "") })
       }
 
