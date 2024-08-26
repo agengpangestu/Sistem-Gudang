@@ -5,6 +5,7 @@ import { LoginValidation, RegisterValidation } from "../validation/auth.validati
 import { logger } from "../utils/logger"
 import { decrypt, encrypt } from "../utils/bcrypt"
 import authService from "../services/auth.service"
+import { signJwt } from "../utils/jwt"
 
 class AuthController {
   public async Register(req: Request, res: Response, next: NextFunction) {
@@ -34,7 +35,7 @@ class AuthController {
     const { error, value } = LoginValidation(req.body)
 
     if (error) {
-      logger.error(`ERR: auth - register = ${error.message}`)
+      logger.error(`ERR: auth - login = ${error.message}`)
       return res.status(422).send({ status: false, statusCode: 422, message: error.message.replace(/\"/g, "") })
     }
     try {
@@ -48,12 +49,17 @@ class AuthController {
         return res.status(422).send({ status: false, statusCode: 422, message: "Password not match" })
       }
 
-      return res
-        .status(200)
-        .send({ status: true, statusCode: 200, message: "Success login", data: { access_token: "43jfddsj", rerfresh_token: "3408fhdfdjfhbd" } })
-    } catch (error) {
-      logger.error(`ERR: auth - register = ${error}`)
-      return res.status(422).send({ status: false, statusCode: 422, message: error })
+      const access_token = signJwt({ ...user }, { expiresIn: "1d" })
+
+      return res.status(200).send({
+        status: true,
+        statusCode: 200,
+        message: "Success login",
+        data: { access_token: access_token, refresh_token: "3408fhdfdjfhbd" }
+      })
+    } catch (error: any) {
+      logger.error(`ERR: auth - login = ${error}`)
+      return res.status(422).send({ status: false, statusCode: 422, message: error.message })
     }
   }
 }
