@@ -5,11 +5,21 @@ import { any } from "joi"
 
 class ProductService {
   public async GetAll(): Promise<any> {
-    return await prismaUtils.prisma.product.findMany()
+    return await prismaUtils.prisma.product.findMany({ orderBy: { createdAt: "desc" } })
   }
 
   public async GetById(id: number): Promise<any> {
-    return await prismaUtils.prisma.product.findUnique({ where: { id: id } })
+    return await prismaUtils.prisma.product.findUnique({
+      where: { id: id },
+      include: {
+        user: {
+          select: {
+            email: true,
+            name: true
+          }
+        }
+      }
+    })
   }
 
   public async Store(payload: Omit<ProductType, "id">): Promise<ProductType | any> {
