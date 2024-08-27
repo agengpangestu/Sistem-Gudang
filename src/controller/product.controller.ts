@@ -73,7 +73,25 @@ class ProductController {
     }
   }
 
-  public async Destroy() {}
+  public async Destroy(req: Request, res: Response) {
+    const {
+      params: { id }
+    } = req
+
+    try {
+      const product = await productService.GetById(parseInt(id))
+      if (!product) return res.status(404).json({ status: false, statusCode: 404, data: "Product not found" })
+
+      const data = await productService.Destroy(parseInt(id))
+      if (data) {
+        logger.info("Success delete product")
+        return res.status(200).json({ status: true, statusCode: 200, message: "Success delete product" })
+      }
+    } catch (error: any) {
+      logger.error(`ERR: user - delete = ${error.message}`)
+      return res.status(422).send({ status: false, statusCode: 422, message: error?.message })
+    }
+  }
 }
 
 export default new ProductController()
