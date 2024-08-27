@@ -1,7 +1,6 @@
 import { Decimal, PrismaClientKnownRequestError } from "@prisma/client/runtime/library"
 import ProductType from "../types/product.type"
 import { prismaUtils } from "../utils/prisma"
-import { any } from "joi"
 
 class ProductService {
   public async GetAll(): Promise<any> {
