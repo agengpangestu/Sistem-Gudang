@@ -8,7 +8,7 @@ class UserController {
     const data: any = await userService.GetAll()
 
     logger.info("Success get all users")
-    res.status(200).json({ status: true, statusCode: 200, data: data })
+    return res.status(200).json({ status: true, statusCode: 200, data: data })
   }
 
   public async GetById(req: Request, res: Response) {
@@ -35,7 +35,7 @@ class UserController {
     try {
       if (error) {
         console.log(error)
-        logger.error(`ERR: auth - update = ${error.message}`)
+        logger.error(`ERR: user - update = ${error.message}`)
         return res.status(422).send({ status: false, statusCode: 422, message: error.message.replace(/\"/g, "") })
       }
 
@@ -52,7 +52,7 @@ class UserController {
         return res.status(200).json({ status: true, statusCode: 200, message: "Success update user" })
       }
     } catch (error: any) {
-      logger.error(`ERR: auth - update = ${error.message}`)
+      logger.error(`ERR: user - update = ${error.message}`)
       return res.status(422).send({ status: false, statusCode: 422, message: error?.message })
     }
   }
@@ -74,7 +74,7 @@ class UserController {
         return res.status(200).json({ status: true, statusCode: 200, message: "Success delete user" })
       }
     } catch (error: any) {
-      logger.error(`ERR: auth - delete = ${error.message}`)
+      logger.error(`ERR: user - delete = ${error.message}`)
       return res.status(422).send({ status: false, statusCode: 422, message: error?.message })
     }
   }
