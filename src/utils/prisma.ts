@@ -8,7 +8,7 @@ class PrismaUtils {
 
   constructor() {
     this.prisma = new PrismaClient({
-      log: ["error", "info", "query", "warn"]
+      log: ["info", "query", "warn"]
     })
   }
 
