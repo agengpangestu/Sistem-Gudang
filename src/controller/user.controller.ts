@@ -2,10 +2,16 @@ import { logger } from "../utils/logger"
 import userService from "../services/user.service"
 import { Request, Response } from "express"
 import { UserValidation } from "../validation/user.validation"
+import UserType from "../types/user.type"
 
 class UserController {
   public async GetAll(req: Request, res: Response) {
-    const data: any = await userService.GetAll()
+    const query = req.query as unknown as UserType
+
+    query.page = parseInt(req.query.page as string) || 1
+    query.limit = parseInt(req.query.limit as string) || 10
+
+    const data: any = await userService.GetAll(query)
 
     logger.info("Success get all users")
     return res.status(200).json({ status: true, statusCode: 200, data: data })
