@@ -5,7 +5,19 @@ import { mutation_type } from "@prisma/client"
 
 class MutationService {
   public async GetAll(): Promise<any> {
-    return await prismaUtils.prisma.mutation.findMany({ orderBy: { createdAt: "desc" } })
+    return await prismaUtils.prisma.mutation.findMany({
+      include: {
+        product: {
+          select: {
+            product_name: true,
+            desc: true,
+            location: true,
+            price: true
+          }
+        }
+      },
+      orderBy: { createdAt: "desc" }
+    })
   }
 
   public async GetById(id: number): Promise<any> {
@@ -55,8 +67,6 @@ class MutationService {
       }
       return await prismaUtils.prisma.mutation.update({ where: { id: id }, data: payload })
     } catch (error: any) {
-      console.log(error);
-      
       if (error instanceof PrismaClientKnownRequestError && error.code === "P2003") {
         throw new Error("Foreign key constraint failed on the field or not found")
       }
