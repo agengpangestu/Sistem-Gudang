@@ -3,10 +3,15 @@ import { ProductUpdateValidation, ProductValidation } from "../validation/produc
 import { v4 as uuidV4 } from "uuid"
 import { logger } from "../utils/logger"
 import productService from "../services/product.service"
+import { ProductType } from "../types/product.type"
 
 class ProductController {
   public async GetAll(req: Request, res: Response) {
-    const data: any = await productService.GetAll()
+    const query = req.query as unknown as ProductType
+    
+    query.page = parseInt(req.query.page as string) || 1
+    query.limit = parseInt(req.query.limit as string) || 10
+    const data: any = await productService.GetAll(query)
 
     logger.info("Success get all products")
     return res.status(200).json({ status: true, statusCode: 200, data: data })
