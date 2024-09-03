@@ -11,8 +11,10 @@ export interface ProductType extends ProductPagination {
   user_id: number
   createdAt: Date
   updatedAt: Date
-  sort_by?: "product_name" | "price"
+  sort_by?: "product_name" | "price" | "createdAt"
   sort_order?: "asc" | "desc"
+  start_date: Date
+  end_date: Date
 }
 
 export interface ProductPagination {
