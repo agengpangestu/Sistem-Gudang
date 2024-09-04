@@ -38,7 +38,7 @@ class MutationController {
     try {
       await mutationService.Store(value)
 
-      logger.error("Success create mutation")
+      logger.info("Success create mutation")
       return res.status(201).send({ status: true, statusCode: 201, message: "Success create mutation" })
     } catch (error: any) {
       logger.error(`ERR: mutation - create = ${error}`)
