@@ -4,7 +4,7 @@ export default interface MutationType {
   int: number
   mutation_id: string
   user_id: number
-  product_id: number
+  product_code: number
   quantity: number
   mutation_type: mutation_type
   createdAt: Date
