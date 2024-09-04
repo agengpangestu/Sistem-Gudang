@@ -1,23 +1,46 @@
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library"
-import MutationType from "../types/mutation.type"
+import { MutationType } from "../types/mutation.type"
 import { prismaUtils } from "../utils/prisma"
 import { mutation_type } from "@prisma/client"
 
 class MutationService {
-  public async GetAll(): Promise<any> {
-    return await prismaUtils.prisma.mutation.findMany({
-      include: {
-        product: {
-          select: {
-            product_name: true,
-            desc: true,
-            location: true,
-            price: true
-          }
-        }
+  public async GetAll(query: MutationType): Promise<any> {
+    const skip = (query.page - 1) * query.limit
+    const take = query.limit
+
+    const mutations = await prismaUtils.prisma.mutation.findMany({
+      select: {
+        mutation_id: true,
+        product_code: true,
+        quantity: true,
+        mutation_type: true,
+        createdAt: true
       },
-      orderBy: { createdAt: "desc" }
+      where: {
+        mutation_type: { equals: query.mutation_type }
+      },
+      orderBy: {
+        [query.sort_by || "createdAt"]: query.sort_order || "asc"
+      },
+      skip: skip,
+      take: take
     })
+
+    const total_data = await prismaUtils.prisma.mutation.count({
+      where: {
+        mutation_type: { equals: query.mutation_type }
+      },
+      orderBy: {
+        [query.sort_by || "createdAt"]: query.sort_order || "asc"
+      }
+    })
+
+    return {
+      total_data: total_data,
+      total_pages: Math.ceil(total_data / query.limit),
+      current_page: query.page,
+      data: mutations
+    }
   }
 
   public async GetById(id: number): Promise<any> {
@@ -46,7 +69,7 @@ class MutationService {
     try {
       if (!Object.values(mutation_type).includes(payload.mutation_type)) {
         throw new Error(
-          `Invalid role: ${payload.mutation_type}. Expected one of ${Object.values(mutation_type).join(", ")}.`
+          `Invalid mutation type: ${payload.mutation_type}. Expected one of ${Object.values(mutation_type).join(", ")}.`
         )
       }
       return await prismaUtils.prisma.mutation.create({ data: payload })
@@ -62,7 +85,7 @@ class MutationService {
     try {
       if (!Object.values(mutation_type).includes(payload.mutation_type)) {
         throw new Error(
-          `Invalid role: ${payload.mutation_type}. Expected one of ${Object.values(mutation_type).join(", ")}.`
+          `Invalid mutation type: ${payload.mutation_type}. Expected one of ${Object.values(mutation_type).join(", ")}.`
         )
       }
       return await prismaUtils.prisma.mutation.update({ where: { id: id }, data: payload })
