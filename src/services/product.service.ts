@@ -1,10 +1,42 @@
 import { Decimal, PrismaClientKnownRequestError } from "@prisma/client/runtime/library"
-import ProductType from "../types/product.type"
+import { ProductType } from "../types/product.type"
 import { prismaUtils } from "../utils/prisma"
 
 class ProductService {
-  public async GetAll(): Promise<any> {
-    return await prismaUtils.prisma.product.findMany({ orderBy: { createdAt: "desc" } })
+  public async GetAll(query: ProductType): Promise<any> {
+    const skip = (query.page - 1) * query.limit
+    const take = query.limit
+
+    const products = await prismaUtils.prisma.product.findMany({
+      select: {
+        product_id: true,
+        product_code: true,
+        product_name: true,
+        location: true,
+        price: true,
+        createdAt: true
+      },
+      where: {
+        product_name: { contains: query.product_name, mode: "insensitive" }
+      },
+      orderBy: { [query.sort_by || "price"]: query.sort_order || "asc" },
+      skip: skip,
+      take: take
+    })
+
+    const total_data = await prismaUtils.prisma.product.count({
+      where: {
+        product_name: { contains: query.product_name, mode: "insensitive" }
+      },
+      orderBy: { [query.sort_by || "price"]: query.sort_order || "asc" }
+    })
+
+    return {
+      total_data: total_data,
+      total_pages: Math.ceil(total_data / query.limit),
+      current_page: query.page,
+      data: products
+    }
   }
 
   public async GetById(id: number): Promise<any> {
