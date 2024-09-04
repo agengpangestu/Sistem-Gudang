@@ -3,10 +3,16 @@ import mutationService from "../services/mutation.service"
 import { logger } from "../utils/logger"
 import { MutationUpdateValidation, MutationValidation } from "../validation/mutation.validation"
 import { v4 as uuidV4 } from "uuid"
+import { MutationType } from "../types/mutation.type"
 
 class MutationController {
   public async GetAll(req: Request, res: Response) {
-    const data = await mutationService.GetAll()
+    const query = req.query as unknown as MutationType
+
+    query.page = parseInt(req.query.page as string) || 1
+    query.limit = parseInt(req.query.limit as string) || 10
+
+    const data = await mutationService.GetAll(query)
 
     logger.info("Success get all mutation")
     return res.status(200).json({ status: true, statusCode: 200, data: data })
