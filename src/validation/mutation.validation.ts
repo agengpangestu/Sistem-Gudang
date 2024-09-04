@@ -1,5 +1,5 @@
 import Joi from "joi"
-import MutationType from "../types/mutation.type"
+import { MutationType } from "../types/mutation.type"
 
 export const MutationValidation = (payload: MutationType) => {
   const schema = Joi.object({
