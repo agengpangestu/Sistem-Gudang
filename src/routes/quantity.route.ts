@@ -4,3 +4,4 @@ import quantityController from "../controller/quantity.controller"
 export const QuantityRoute: Router = Router()
 
 QuantityRoute.get("/", quantityController.GetAll)
+QuantityRoute.get("/total-quantity", quantityController.GetQuantityOfProduct)
