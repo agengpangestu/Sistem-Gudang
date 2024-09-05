@@ -10,7 +10,8 @@ class FakerService {
       return await prismaUtils.prisma.product.create({
         data: {
           ...payload,
-          price: new Decimal(payload.price)
+          price: new Decimal(payload.price),
+          createdAt: new Date()
         }
       })
     } catch (error) {
