@@ -15,6 +15,7 @@ export interface ProductType extends ProductPagination {
   sort_order?: "asc" | "desc"
   start_date: Date
   end_date: Date
+  mutation_type: "in" | "out"
 }
 
 export interface ProductPagination {
