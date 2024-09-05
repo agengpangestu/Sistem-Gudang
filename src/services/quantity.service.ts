@@ -55,19 +55,21 @@ class QuantityService {
     const skip = (query.page - 1) * query.limit
     const take = query.limit
 
+    // group by product_code first
     const mutations = await prismaUtils.prisma.mutation.groupBy({
       by: ["product_code"],
       _sum: { quantity: true },
       where: { mutation_type: query.mutation_type }
     })
 
+    // calculate total items and pages
     const total_items = mutations.length
     const total_pages = Math.ceil(total_items / query.limit)
 
-    // slice // btw i so confused, damn!
-    const pageMutation = mutations.slice(skip, query.page * query.limit)
+    // slice // btw i so confused, damn! // slice data for pagination
+    const pageMutation = mutations.slice(skip, query.page * take)
 
-    // map mutations table for get product_code
+    // map mutations table for get all product_code
     const product_codes = mutations.map((data) => data.product_code)
 
     // find all product using product_code
@@ -75,7 +77,7 @@ class QuantityService {
       where: { product_code: { in: product_codes } }
     })
 
-    // find product_code, product_name, and quantity
+    // map for get all product_code, product_name, and quantity
     const results = pageMutation.map((data) => {
       const product = fetch_products.find((item) => item.product_code === data.product_code)
       const total_quantity = data._sum.quantity
