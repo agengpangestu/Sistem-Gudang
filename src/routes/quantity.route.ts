@@ -1,8 +1,9 @@
 import { Router } from "express"
-import quantityController from "../controller/quantity.controller"
 import { RequiredAdmin } from "../middleware/auth"
+import QuantityController from "../controller/quantity.controller"
 
+const quantity = new QuantityController()
 export const QuantityRoute: Router = Router()
 
-QuantityRoute.get("/", RequiredAdmin, quantityController.GetAll)
-QuantityRoute.get("/total-quantity", RequiredAdmin, quantityController.GetQuantityOfProduct)
+QuantityRoute.get("/", RequiredAdmin, quantity.GetAll)
+QuantityRoute.get("/total-quantity", RequiredAdmin, quantity.GetQuantityOfProduct)
