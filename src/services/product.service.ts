@@ -1,13 +1,19 @@
 import { Decimal, PrismaClientKnownRequestError } from "@prisma/client/runtime/library"
 import { ProductType } from "../types/product.type"
-import { prismaUtils } from "../utils/prisma"
+import PrismaUtils from "../utils/prisma"
 
 class ProductService {
+  private prisma: PrismaUtils
+
+  constructor() {
+    this.prisma = new PrismaUtils()
+  }
+
   public async GetAll(query: ProductType): Promise<any> {
     const skip = (query.page - 1) * query.limit
     const take = query.limit
 
-    const products = await prismaUtils.prisma.product.findMany({
+    const products = await this.prisma.products.findMany({
       select: {
         product_id: true,
         product_code: true,
@@ -28,7 +34,7 @@ class ProductService {
       take: take
     })
 
-    const total_data = await prismaUtils.prisma.product.count({
+    const total_data = await this.prisma.products.count({
       where: {
         product_name: { contains: query.product_name, mode: "insensitive" },
         createdAt: {
@@ -48,7 +54,7 @@ class ProductService {
   }
 
   public async GetById(id: number): Promise<any> {
-    return await prismaUtils.prisma.product.findUnique({
+    return await this.prisma.products.findUnique({
       where: { id: id },
       include: {
         user: {
@@ -63,7 +69,7 @@ class ProductService {
 
   public async Store(payload: Omit<ProductType, "id">): Promise<ProductType | any> {
     try {
-      return await prismaUtils.prisma.product.create({
+      return await this.prisma.products.create({
         data: {
           ...payload,
           price: new Decimal(payload.price)
@@ -79,7 +85,7 @@ class ProductService {
 
   public async Update(id: number, payload: Omit<ProductType, "product_id">): Promise<ProductType | any> {
     try {
-      return await prismaUtils.prisma.product.update({
+      return await this.prisma.products.update({
         where: { id: id },
         data: {
           ...payload,
@@ -95,8 +101,8 @@ class ProductService {
   }
 
   public async Destroy(id: number): Promise<any> {
-    return await prismaUtils.prisma.product.delete({ where: { id: id } })
+    return await this.prisma.products.delete({ where: { id: id } })
   }
 }
 
-export default new ProductService()
+export default ProductService

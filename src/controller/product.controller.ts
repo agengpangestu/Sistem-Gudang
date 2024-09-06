@@ -2,16 +2,26 @@ import { NextFunction, Request, Response } from "express"
 import { ProductUpdateValidation, ProductValidation } from "../validation/product..validation"
 import { v4 as uuidV4 } from "uuid"
 import { logger } from "../utils/logger"
-import productService from "../services/product.service"
 import { ProductType } from "../types/product.type"
+import ProductService from "../services/product.service"
 
 class ProductController {
+  private productService: ProductService
+  
+  constructor() {
+    this.productService = new ProductService()
+    this.GetAll = this.GetAll.bind(this)
+    this.GetById = this.GetById.bind(this)
+    this.Store = this.Store.bind(this)
+    this.Update = this.Update.bind(this)
+    this.Destroy = this.Destroy.bind(this)
+  }
   public async GetAll(req: Request, res: Response) {
     const query = req.query as unknown as ProductType
-    
+
     query.page = parseInt(req.query.page as string) || 1
     query.limit = parseInt(req.query.limit as string) || 10
-    const data: any = await productService.GetAll(query)
+    const data: any = await this.productService.GetAll(query)
 
     logger.info("Success get all products")
     return res.status(200).json({ status: true, statusCode: 200, data: data })
@@ -22,7 +32,7 @@ class ProductController {
       params: { id }
     } = req
 
-    const product: any = await productService.GetById(parseInt(id))
+    const product: any = await this.productService.GetById(parseInt(id))
 
     if (!product) {
       return res.status(404).json({ success: false, statusCode: 404, message: "Product not found", data: {} })
@@ -41,7 +51,7 @@ class ProductController {
     }
 
     try {
-      await productService.Store(value)
+      await this.productService.Store(value)
       return res.status(201).send({ status: true, statusCode: 201, message: "Success create product" })
     } catch (error: any) {
       logger.error(`ERR: product - create = ${error}`)
@@ -62,12 +72,12 @@ class ProductController {
     }
 
     try {
-      const product = await productService.GetById(parseInt(id))
+      const product = await this.productService.GetById(parseInt(id))
       if (!product) {
         return res.status(404).json({ status: false, statusCode: 404, data: "Product not found" })
       }
 
-      const data = await productService.Update(parseInt(id), value)
+      const data = await this.productService.Update(parseInt(id), value)
       if (data) {
         logger.info("Success update product")
         return res.status(200).json({ status: true, statusCode: 200, message: "Success update product" })
@@ -84,10 +94,10 @@ class ProductController {
     } = req
 
     try {
-      const product = await productService.GetById(parseInt(id))
+      const product = await this.productService.GetById(parseInt(id))
       if (!product) return res.status(404).json({ status: false, statusCode: 404, data: "Product not found" })
 
-      const data = await productService.Destroy(parseInt(id))
+      const data = await this.productService.Destroy(parseInt(id))
       if (data) {
         logger.info("Success delete product")
         return res.status(200).json({ status: true, statusCode: 200, message: "Success delete product" })
@@ -99,4 +109,4 @@ class ProductController {
   }
 }
 
-export default new ProductController()
+export default ProductController
