@@ -1,14 +1,20 @@
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library"
 import { MutationType } from "../types/mutation.type"
-import { prismaUtils } from "../utils/prisma"
 import { mutation_type } from "@prisma/client"
+import PrismaUtils from "../utils/prisma"
 
 class MutationService {
+  private prisma: PrismaUtils
+
+  constructor() {
+    this.prisma = new PrismaUtils()
+  }
+
   public async GetAll(query: MutationType): Promise<any> {
     const skip = (query.page - 1) * query.limit
     const take = query.limit
 
-    const mutations = await prismaUtils.prisma.mutation.findMany({
+    const mutations = await this.prisma.mutations.findMany({
       select: {
         mutation_id: true,
         product_code: true,
@@ -26,7 +32,7 @@ class MutationService {
       take: take
     })
 
-    const total_data = await prismaUtils.prisma.mutation.count({
+    const total_data = await this.prisma.mutations.count({
       where: {
         mutation_type: { equals: query.mutation_type }
       },
@@ -44,7 +50,7 @@ class MutationService {
   }
 
   public async GetById(id: number): Promise<any> {
-    return await prismaUtils.prisma.mutation.findUnique({
+    return await this.prisma.mutations.findUnique({
       where: { id: id },
       include: {
         product: {
@@ -72,7 +78,7 @@ class MutationService {
           `Invalid mutation type: ${payload.mutation_type}. Expected one of ${Object.values(mutation_type).join(", ")}.`
         )
       }
-      return await prismaUtils.prisma.mutation.create({ data: payload })
+      return await this.prisma.mutations.create({ data: payload })
     } catch (error: any) {
       if (error instanceof PrismaClientKnownRequestError && error.code === "P2003") {
         throw new Error("Foreign key constraint failed on the field or not found")
@@ -88,7 +94,7 @@ class MutationService {
           `Invalid mutation type: ${payload.mutation_type}. Expected one of ${Object.values(mutation_type).join(", ")}.`
         )
       }
-      return await prismaUtils.prisma.mutation.update({ where: { id: id }, data: payload })
+      return await this.prisma.mutations.update({ where: { id: id }, data: payload })
     } catch (error: any) {
       if (error instanceof PrismaClientKnownRequestError && error.code === "P2003") {
         throw new Error("Foreign key constraint failed on the field or not found")
@@ -98,8 +104,8 @@ class MutationService {
   }
 
   public async Destroy(id: number): Promise<any> {
-    return await prismaUtils.prisma.mutation.delete({ where: { id: id } })
+    return await this.prisma.mutations.delete({ where: { id: id } })
   }
 }
 
-export default new MutationService()
+export default MutationService

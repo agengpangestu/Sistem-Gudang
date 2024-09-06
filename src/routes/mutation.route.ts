@@ -1,7 +1,8 @@
 import { Router } from "express"
-import mutationController from "../controller/mutation.controller"
 import { RequiredAdmin } from "../middleware/auth"
+import MutationController from "../controller/mutation.controller"
 
+const mutationController = new MutationController()
 export const MutationRoute: Router = Router()
 
 MutationRoute.get("/", mutationController.GetAll)

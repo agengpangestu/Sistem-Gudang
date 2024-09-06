@@ -1,18 +1,29 @@
 import { Request, Response } from "express"
-import mutationService from "../services/mutation.service"
 import { logger } from "../utils/logger"
 import { MutationUpdateValidation, MutationValidation } from "../validation/mutation.validation"
 import { v4 as uuidV4 } from "uuid"
 import { MutationType } from "../types/mutation.type"
+import MutationService from "../services/mutation.service"
 
 class MutationController {
+  private mutationService: MutationService
+
+  constructor() {
+    this.mutationService = new MutationService()
+    this.GetAll = this.GetAll.bind(this)
+    this.GetById = this.GetById.bind(this)
+    this.Store = this.Store.bind(this)
+    this.Update = this.Update.bind(this)
+    this.Destroy = this.Destroy.bind(this)
+  }
+
   public async GetAll(req: Request, res: Response) {
     const query = req.query as unknown as MutationType
 
     query.page = parseInt(req.query.page as string) || 1
     query.limit = parseInt(req.query.limit as string) || 10
 
-    const data = await mutationService.GetAll(query)
+    const data = await this.mutationService.GetAll(query)
 
     logger.info("Success get all mutation")
     return res.status(200).json({ status: true, statusCode: 200, data: data })
@@ -22,7 +33,7 @@ class MutationController {
     const {
       params: { id }
     } = req
-    const mutation = await mutationService.GetById(parseInt(id))
+    const mutation = await this.mutationService.GetById(parseInt(id))
 
     if (!mutation) {
       return res.status(404).json({ success: false, statusCode: 404, message: "Mutation not found", data: {} })
@@ -42,7 +53,7 @@ class MutationController {
     }
 
     try {
-      await mutationService.Store(value)
+      await this.mutationService.Store(value)
 
       logger.info("Success create mutation")
       return res.status(201).send({ status: true, statusCode: 201, message: "Success create mutation" })
@@ -65,12 +76,12 @@ class MutationController {
     }
 
     try {
-      const mutation = await mutationService.GetById(parseInt(id))
+      const mutation = await this.mutationService.GetById(parseInt(id))
       if (!mutation) {
         return res.status(404).json({ status: false, statusCode: 404, data: "Mutation not found" })
       }
 
-      const data = await mutationService.Update(parseInt(id), value)
+      const data = await this.mutationService.Update(parseInt(id), value)
 
       if (data) {
         logger.info("Success update mutation")
@@ -88,10 +99,10 @@ class MutationController {
     } = req
 
     try {
-      const mutation = await mutationService.GetById(parseInt(id))
+      const mutation = await this.mutationService.GetById(parseInt(id))
       if (!mutation) return res.status(404).json({ status: false, statusCode: 404, data: "Mutation not found" })
 
-      const data = await mutationService.Destroy(parseInt(id))
+      const data = await this.mutationService.Destroy(parseInt(id))
       if (data) {
         logger.info("Success delete mutation")
         return res.status(200).json({ status: true, statusCode: 200, message: "Success delete mutation" })
@@ -103,4 +114,4 @@ class MutationController {
   }
 }
 
-export default new MutationController()
+export default MutationController
