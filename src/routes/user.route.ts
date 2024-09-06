@@ -1,7 +1,8 @@
 import { Router } from "express"
-import userController from "../controller/user.controller"
 import { RequiredAdmin } from "../middleware/auth"
+import UserController from "../controller/user.controller"
 
+const userController = new UserController()
 export const UserRoute: Router = Router()
 
 UserRoute.get("/", RequiredAdmin, userController.GetAll)
