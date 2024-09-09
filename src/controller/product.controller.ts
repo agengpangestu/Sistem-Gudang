@@ -4,10 +4,12 @@ import { v4 as uuidV4 } from "uuid"
 import { logger } from "../utils/logger"
 import { ProductType } from "../types/product.type"
 import ProductService from "../services/product.service"
+import ErrorNotFound from "../helpers/not.found"
+import JoiError from "../helpers/joi"
 
 class ProductController {
   private productService: ProductService
-  
+
   constructor() {
     this.productService = new ProductService()
     this.GetAll = this.GetAll.bind(this)
@@ -16,65 +18,72 @@ class ProductController {
     this.Update = this.Update.bind(this)
     this.Destroy = this.Destroy.bind(this)
   }
-  public async GetAll(req: Request, res: Response) {
+
+  public async GetAll(req: Request, res: Response, next: NextFunction) {
     const query = req.query as unknown as ProductType
 
-    query.page = parseInt(req.query.page as string) || 1
-    query.limit = parseInt(req.query.limit as string) || 10
-    const data: any = await this.productService.GetAll(query)
+    try {
+      query.page = parseInt(req.query.page as string) || 1
+      query.limit = parseInt(req.query.limit as string) || 10
+      const data: any = await this.productService.GetAll(query)
 
-    logger.info("Success get all products")
-    return res.status(200).json({ status: true, statusCode: 200, data: data })
+      logger.info("Success get all products")
+      return res.status(200).json({ status: true, statusCode: 200, data: data })
+    } catch (error: any) {
+      next(error)
+    }
   }
 
-  public async GetById(req: Request, res: Response) {
+  public async GetById(req: Request, res: Response, next: NextFunction) {
     const {
       params: { id }
     } = req
 
-    const product: any = await this.productService.GetById(parseInt(id))
+    try {
+      const product: any = await this.productService.GetById(parseInt(id))
 
-    if (!product) {
-      return res.status(404).json({ success: false, statusCode: 404, message: "Product not found", data: {} })
+      if (!product) {
+        throw next(new ErrorNotFound())
+      }
+
+      return res.status(200).json({ success: false, statusCode: 200, data: product })
+    } catch (error: any) {
+      next(error)
     }
-
-    return res.status(200).json({ success: false, statusCode: 200, data: product })
   }
 
-  public async Store(req: Request, res: Response) {
+  public async Store(req: Request, res: Response, next: NextFunction) {
     req.body.product_id = uuidV4()
     const { error, value } = ProductValidation(req.body)
 
-    if (error) {
-      logger.error(`ERR: product - product create = ${error.message}`)
-      return res.status(422).send({ status: false, statusCode: 422, message: error.message.replace(/\"/g, "") })
-    }
-
     try {
+      if (error) {
+        logger.error(`ERR: product - product create = ${error.message}`)
+        throw next(new JoiError(error.name, error.message))
+      }
+
       await this.productService.Store(value)
       return res.status(201).send({ status: true, statusCode: 201, message: "Success create product" })
     } catch (error: any) {
-      logger.error(`ERR: product - create = ${error}`)
-      return res.status(422).send({ status: false, statusCode: 422, message: error.message })
+      next(error)
     }
   }
 
-  public async Update(req: Request, res: Response) {
+  public async Update(req: Request, res: Response, next: NextFunction) {
     const {
       params: { id }
     } = req
 
     const { error, value } = ProductUpdateValidation(req.body)
 
-    if (error) {
-      logger.error(`ERR: product - update = ${error.message}`)
-      return res.status(422).send({ status: false, statusCode: 422, message: error.message.replace(/\"/g, "") })
-    }
-
     try {
+      if (error) {
+        throw next(new JoiError(error.name, error.message))
+      }
+
       const product = await this.productService.GetById(parseInt(id))
       if (!product) {
-        return res.status(404).json({ status: false, statusCode: 404, data: "Product not found" })
+        throw next(new ErrorNotFound())
       }
 
       const data = await this.productService.Update(parseInt(id), value)
@@ -83,19 +92,18 @@ class ProductController {
         return res.status(200).json({ status: true, statusCode: 200, message: "Success update product" })
       }
     } catch (error: any) {
-      logger.error(`ERR: product - update = ${error.message}`)
-      return res.status(422).send({ status: false, statusCode: 422, message: error?.message })
+      next(error)
     }
   }
 
-  public async Destroy(req: Request, res: Response) {
+  public async Destroy(req: Request, res: Response, next: NextFunction) {
     const {
       params: { id }
     } = req
 
     try {
       const product = await this.productService.GetById(parseInt(id))
-      if (!product) return res.status(404).json({ status: false, statusCode: 404, data: "Product not found" })
+      if (!product) throw next(new ErrorNotFound())
 
       const data = await this.productService.Destroy(parseInt(id))
       if (data) {
@@ -103,8 +111,7 @@ class ProductController {
         return res.status(200).json({ status: true, statusCode: 200, message: "Success delete product" })
       }
     } catch (error: any) {
-      logger.error(`ERR: user - delete = ${error.message}`)
-      return res.status(422).send({ status: false, statusCode: 422, message: error?.message })
+      next(error)
     }
   }
 }
