@@ -1,14 +1,11 @@
 import { NextFunction, Request, Response } from "express"
+import Unauthorized from "../helpers/unauthorized"
 
 export const RequiredAdmin = (req: Request, res: Response, next: NextFunction) => {
   const user = res.locals.user
 
   if (!user || user.role !== "admin")
-    return res.status(403).json({
-      success: false,
-      message: "This route is protected and you don't has authority to access",
-      statusCode: 403
-    })
+    throw next(new Unauthorized)
 
   return next()
 }
