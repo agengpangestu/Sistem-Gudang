@@ -16,6 +16,8 @@ export interface ProductType extends ProductPagination {
   start_date: Date
   end_date: Date
   mutation_type: "in" | "out"
+  max_price: Decimal
+  min_price: Decimal
 }
 
 export interface ProductPagination {
