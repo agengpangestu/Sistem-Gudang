@@ -1,9 +1,8 @@
 import { NextFunction, Request, Response } from "express"
 import Unauthorized from "./unauthorized"
-import { logger } from "../utils/logger"
 import ErrorNotFound from "./not.found"
-import Joi from "joi"
 import JoiError from "./joi"
+import DatabaseErrorConstraint from "./database"
 
 export const GlobalError = (err: Error, req: Request, res: Response, next: NextFunction) => {
   if (err instanceof Unauthorized) {
@@ -28,6 +27,14 @@ export const GlobalError = (err: Error, req: Request, res: Response, next: NextF
       details: err.details,
       statusCode: 422
     })
+  } else if (err instanceof DatabaseErrorConstraint) {
+    return res.status(422).json({
+      status: false,
+      name: err.name,
+      code: err.code,
+      message: err.message.replace(/\"/g, ""),
+      statusCode: 422
+    })
   } else {
     return res.status(500).json({
       status: false,
@@ -35,5 +42,4 @@ export const GlobalError = (err: Error, req: Request, res: Response, next: NextF
       statusCode: 500
     })
   }
-
 }
