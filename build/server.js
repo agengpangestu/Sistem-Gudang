@@ -8,4 +8,5 @@ const server_1 = __importDefault(require("./utils/server"));
 const app = (0, server_1.default)();
 const PORT = 4000;
 app.listen(PORT, () => logger_1.logger.info(`server running at port ${PORT}`));
+exports.default = app;
 //# sourceMappingURL=server.js.map
