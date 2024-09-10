@@ -1,4 +1,3 @@
-import "../src/utils/prisma"
 import { logger } from "./utils/logger"
 import createServer from "./utils/server"
 
