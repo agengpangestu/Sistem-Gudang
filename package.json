@@ -6,13 +6,23 @@
   "scripts": {
     "start": "npx tsc -w",
     "dev": "npx nodemon",
-    "build": "npx tsc",
+
+    "build": "rimraf build && npx tsc",
+    "ts.check": "tsc --project tsconfig.json",
+    "add-build": "git add build",
+
     "format": "prettier --write",
     "test-jest": "jest --detectOpenHandles",
     "test": "echo \"Error: no test specified\" && exit 1",
     "prge": "npx prisma generate",
     "prmi": "npx prisma migrate dev"
   },
+  "pre-commit": [
+    "ts.check",
+    "build",
+    "add-build"
+  ],
+
   "author": "Ageng Pangestu",
   "license": "ISC",
   "devDependencies": {
