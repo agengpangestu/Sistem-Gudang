@@ -4,8 +4,8 @@
   "description": "REST API Sistem Gudang",
   "main": "server.ts",
   "scripts": {
-    "start": "npx tsc -w",
-    "dev": "npx nodemon",
+    "start": "npx nodemon",
+    "dev": "npx tsc -w",
     "build": "rimraf build && tsc",
     "ts.check": "tsc --project tsconfig.json",
     "add-build": "git add build",
