@@ -2,7 +2,7 @@
 node_modules
 
 #enviroment
-.env
+# .env
 
 #migration
 prisma/migrations
