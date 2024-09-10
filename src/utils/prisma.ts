@@ -5,11 +5,22 @@ export const prisma = new PrismaClient({
 })
 class PrismaUtils {
   public prisma: PrismaClient
+  static prisma: any
 
   constructor() {
-    this.prisma = new PrismaClient({
-      log: ["info", "query", "warn"]
-    })
+    this.prisma = prisma
+  }
+
+  get products(){
+    return this.prisma.product
+  }
+
+  get mutations() {
+    return this.prisma.mutation
+  }
+
+  get users() {
+    return this.prisma.user
   }
 
   public async connect() {
@@ -21,4 +32,4 @@ class PrismaUtils {
   }
 }
 
-export const prismaUtils = new PrismaUtils()
+export default PrismaUtils
