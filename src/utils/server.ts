@@ -3,6 +3,7 @@ import express, { Application } from "express"
 import cors from "cors"
 import deserializedToken from "./deserializedToken"
 import { routes } from "../routes/index.routes"
+import { GlobalError } from "../helpers/global"
 
 const createServer = () => {
   const app: Application = express()
@@ -21,8 +22,11 @@ const createServer = () => {
 
   app.use(deserializedToken)
 
+  
   routes(app)
-
+  
+  app.use(GlobalError)
+  
   return app
 }
 
