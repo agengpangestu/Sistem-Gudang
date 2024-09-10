@@ -1,6 +1,7 @@
 import { Decimal, PrismaClientKnownRequestError } from "@prisma/client/runtime/library"
 import { ProductType } from "../types/product.type"
 import PrismaUtils from "../utils/prisma"
+import DatabaseErrorConstraint from "../helpers/database"
 
 class ProductService {
   private prisma: PrismaUtils
@@ -77,6 +78,7 @@ class ProductService {
       })
     } catch (error: any) {
       if (error instanceof PrismaClientKnownRequestError && error.code === "P2003") {
+        // throw new DatabaseErrorConstraint(error.name, error.code, error.message)
         throw new Error("Foreign key constraint failed on the field or not found")
       }
       throw error
