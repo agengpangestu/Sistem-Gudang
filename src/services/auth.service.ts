@@ -26,7 +26,6 @@ class AuthService {
     try {
       return await this.prisma.users.findUnique({ where: { email: email } })
     } catch (error) {
-      console.log(error)
       throw error
     }
   }
