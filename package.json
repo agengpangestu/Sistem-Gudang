@@ -4,22 +4,15 @@
   "description": "REST API Sistem Gudang",
   "main": "server.ts",
   "scripts": {
-    "start": "npx nodemon",
-    "dev": "npx tsc -w",
-    "build": "rimraf build && tsc",
-    "ts.check": "tsc --project tsconfig.json",
-    "add-build": "git add build",
+    "start": "npx tsc -w",
+    "dev": "npx nodemon",
+    "build": "tsc",
     "format": "prettier --write",
     "test-jest": "jest --detectOpenHandles",
     "test": "echo \"Error: no test specified\" && exit 1",
     "prge": "npx prisma generate",
     "prmi": "npx prisma migrate dev"
   },
-  "pre-commit": [
-    "ts.check",
-    "build",
-    "add-build"
-  ],
   "author": "Ageng Pangestu",
   "license": "ISC",
   "devDependencies": {
