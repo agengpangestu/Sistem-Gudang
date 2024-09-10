@@ -22,7 +22,6 @@
     "build",
     "add-build"
   ],
-
   "author": "Ageng Pangestu",
   "license": "ISC",
   "devDependencies": {
