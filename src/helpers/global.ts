@@ -6,11 +6,11 @@ import DatabaseErrorConstraint from "./database"
 
 export const GlobalError = (err: Error, req: Request, res: Response, next: NextFunction) => {
   if (err instanceof Unauthorized) {
-    return res.status(403).json({
+    return res.status(401).json({
       status: false,
       name: err.name,
       message: err.message,
-      statusCode: 403
+      statusCode: 401
     })
   } else if (err instanceof ErrorNotFound) {
     return res.status(404).json({
