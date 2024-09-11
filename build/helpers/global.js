@@ -10,11 +10,11 @@ const joi_1 = __importDefault(require("./joi"));
 const database_1 = __importDefault(require("./database"));
 const GlobalError = (err, req, res, next) => {
     if (err instanceof unauthorized_1.default) {
-        return res.status(403).json({
+        return res.status(401).json({
             status: false,
             name: err.name,
             message: err.message,
-            statusCode: 403
+            statusCode: 401
         });
     }
     else if (err instanceof not_found_1.default) {
