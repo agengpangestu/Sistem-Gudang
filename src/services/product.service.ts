@@ -54,9 +54,9 @@ class ProductService {
     }
   }
 
-  public async GetById(id: number): Promise<any> {
+  public async GetById(product_code: number): Promise<any> {
     return await this.prisma.products.findUnique({
-      where: { id: id },
+      where: { product_code: product_code },
       include: {
         user: {
           select: {
@@ -85,10 +85,10 @@ class ProductService {
     }
   }
 
-  public async Update(id: number, payload: Omit<ProductType, "product_id">): Promise<ProductType | any> {
+  public async Update(product_code: number, payload: Omit<ProductType, "product_id">): Promise<ProductType | any> {
     try {
       return await this.prisma.products.update({
-        where: { id: id },
+        where: { product_code: product_code },
         data: {
           ...payload,
           price: new Decimal(payload.price)
@@ -102,8 +102,8 @@ class ProductService {
     }
   }
 
-  public async Destroy(id: number): Promise<any> {
-    return await this.prisma.products.delete({ where: { id: id } })
+  public async Destroy(product_code: number): Promise<any> {
+    return await this.prisma.products.delete({ where: { product_code: product_code } })
   }
 }
 
