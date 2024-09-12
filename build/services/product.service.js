@@ -14,6 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const library_1 = require("@prisma/client/runtime/library");
 const prisma_1 = __importDefault(require("../utils/prisma"));
+const database_1 = __importDefault(require("../helpers/database"));
 class ProductService {
     constructor() {
         this.prisma = new prisma_1.default();
@@ -60,10 +61,10 @@ class ProductService {
             };
         });
     }
-    GetById(id) {
+    GetById(product_code) {
         return __awaiter(this, void 0, void 0, function* () {
             return yield this.prisma.products.findUnique({
-                where: { id: id },
+                where: { product_code: product_code },
                 include: {
                     user: {
                         select: {
@@ -77,39 +78,43 @@ class ProductService {
     }
     Store(payload) {
         return __awaiter(this, void 0, void 0, function* () {
+            var _a, _b;
             try {
                 return yield this.prisma.products.create({
                     data: Object.assign(Object.assign({}, payload), { price: new library_1.Decimal(payload.price) })
                 });
             }
             catch (error) {
-                if (error instanceof library_1.PrismaClientKnownRequestError && error.code === "P2003") {
-                    // throw new DatabaseErrorConstraint(error.name, error.code, error.message)
-                    throw new Error("Foreign key constraint failed on the field or not found");
+                if (error instanceof library_1.PrismaClientKnownRequestError && error.code === "P2002") {
+                    throw new database_1.default(error.name, `field: '${(_a = error.meta) === null || _a === void 0 ? void 0 : _a.target}' must unique`);
+                }
+                else if (error instanceof library_1.PrismaClientKnownRequestError && error.code === "P2003") {
+                    throw new database_1.default(error.name, `Foreign key constraint '${(_b = error.meta) === null || _b === void 0 ? void 0 : _b.field_name}' not found`);
                 }
                 throw error;
             }
         });
     }
-    Update(id, payload) {
+    Update(product_code, payload) {
         return __awaiter(this, void 0, void 0, function* () {
+            var _a;
             try {
                 return yield this.prisma.products.update({
-                    where: { id: id },
+                    where: { product_code: product_code },
                     data: Object.assign(Object.assign({}, payload), { price: new library_1.Decimal(payload.price) })
                 });
             }
             catch (error) {
                 if (error instanceof library_1.PrismaClientKnownRequestError && error.code === "P2003") {
-                    throw new Error("Foreign key constraint failed on the field or not found");
+                    throw new database_1.default(error.name, `Foreign key constraint '${(_a = error.meta) === null || _a === void 0 ? void 0 : _a.field_name}' not found`);
                 }
                 throw error;
             }
         });
     }
-    Destroy(id) {
+    Destroy(product_code) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.prisma.products.delete({ where: { id: id } });
+            return yield this.prisma.products.delete({ where: { product_code: product_code } });
         });
     }
 }

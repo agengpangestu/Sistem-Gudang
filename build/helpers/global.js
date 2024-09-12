@@ -38,7 +38,6 @@ const GlobalError = (err, req, res, next) => {
         return res.status(422).json({
             status: false,
             name: err.name,
-            code: err.code,
             message: err.message.replace(/\"/g, ""),
             statusCode: 422
         });

@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const library_1 = require("@prisma/client/runtime/library");
 const client_1 = require("@prisma/client");
 const prisma_1 = __importDefault(require("../utils/prisma"));
+const database_1 = __importDefault(require("../helpers/database"));
 class MutationService {
     constructor() {
         this.prisma = new prisma_1.default();
@@ -81,6 +82,7 @@ class MutationService {
     }
     Store(payload) {
         return __awaiter(this, void 0, void 0, function* () {
+            var _a;
             try {
                 if (!Object.values(client_1.mutation_type).includes(payload.mutation_type)) {
                     throw new Error(`Invalid mutation type: ${payload.mutation_type}. Expected one of ${Object.values(client_1.mutation_type).join(", ")}.`);
@@ -89,7 +91,7 @@ class MutationService {
             }
             catch (error) {
                 if (error instanceof library_1.PrismaClientKnownRequestError && error.code === "P2003") {
-                    throw new Error("Foreign key constraint failed on the field or not found");
+                    throw new database_1.default(error.name, `Foreign key constraint '${(_a = error.meta) === null || _a === void 0 ? void 0 : _a.field_name}' not found`);
                 }
                 throw error;
             }
@@ -97,6 +99,7 @@ class MutationService {
     }
     Update(id, payload) {
         return __awaiter(this, void 0, void 0, function* () {
+            var _a;
             try {
                 if (!Object.values(client_1.mutation_type).includes(payload.mutation_type)) {
                     throw new Error(`Invalid mutation type: ${payload.mutation_type}. Expected one of ${Object.values(client_1.mutation_type).join(", ")}.`);
@@ -105,7 +108,7 @@ class MutationService {
             }
             catch (error) {
                 if (error instanceof library_1.PrismaClientKnownRequestError && error.code === "P2003") {
-                    throw new Error("Foreign key constraint failed on the field or not found");
+                    throw new database_1.default(error.name, `Foreign key constraint '${(_a = error.meta) === null || _a === void 0 ? void 0 : _a.field_name}' not found`);
                 }
                 throw error;
             }

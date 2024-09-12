@@ -33,11 +33,8 @@ class AuthController {
                 return res.status(201).send({ status: true, statusCode: 201, message: "Register success" });
             }
             catch (error) {
-                if (error.message) {
-                    return res.status(422).send({ status: false, statusCode: 422, message: error.message });
-                }
                 logger_1.logger.error(`ERR: auth - register = ${error}`);
-                return res.status(422).send({ status: false, statusCode: 422, message: error });
+                next(error);
             }
         });
     }
@@ -67,7 +64,7 @@ class AuthController {
             }
             catch (error) {
                 logger_1.logger.error(`ERR: auth - login = ${error}`);
-                return res.status(422).send({ status: false, statusCode: 422, message: error.message });
+                next(error);
             }
         });
     }

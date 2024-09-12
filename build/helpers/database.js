@@ -2,10 +2,9 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const client_1 = require("@prisma/client");
 class DatabaseErrorConstraint extends client_1.Prisma.PrismaClientKnownRequestError {
-    constructor(name, code, message) {
+    constructor(name, message) {
         super(name, message);
         this.name = name;
-        this.code = code;
         this.message = message;
     }
 }

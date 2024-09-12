@@ -14,18 +14,24 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const library_1 = require("@prisma/client/runtime/library");
 const prisma_1 = __importDefault(require("../utils/prisma"));
+const database_1 = __importDefault(require("../helpers/database"));
 class AuthService {
     constructor() {
         this.prisma = new prisma_1.default();
     }
     Register(payload) {
         return __awaiter(this, void 0, void 0, function* () {
+            var _a;
             try {
                 return yield this.prisma.users.create({ data: payload });
             }
             catch (error) {
                 if (error instanceof library_1.PrismaClientKnownRequestError && error.code === "P2002") {
-                    throw new Error("Email has been registered");
+                    if (error) {
+                        let err = (_a = error.meta) === null || _a === void 0 ? void 0 : _a.target;
+                        const a = err.map((e) => e);
+                        throw new database_1.default(error.name, `field: '${a}' must unique or registered`);
+                    }
                 }
                 throw error;
             }

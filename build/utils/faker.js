@@ -26,7 +26,7 @@ class FakerController {
             req.body.product_name = faker_1.faker.commerce.productName();
             req.body.desc = faker_1.faker.commerce.productDescription();
             req.body.price = faker_1.faker.commerce.price({ min: 5, max: 100 });
-            req.body.user_id = 47;
+            req.body.user_id = 5;
             req.body.location = "Gudang A";
             const { error, value } = (0, product__validation_1.ProductValidation)(req.body);
             if (error) {
