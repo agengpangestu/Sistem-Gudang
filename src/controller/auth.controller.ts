@@ -23,11 +23,8 @@ class AuthController {
       await authService.Register(value)
       return res.status(201).send({ status: true, statusCode: 201, message: "Register success" })
     } catch (error: any) {
-      if (error.message) {
-        return res.status(422).send({ status: false, statusCode: 422, message: error.message })
-      }
       logger.error(`ERR: auth - register = ${error}`)
-      return res.status(422).send({ status: false, statusCode: 422, message: error })
+      next(error)
     }
   }
 
@@ -59,7 +56,7 @@ class AuthController {
       })
     } catch (error: any) {
       logger.error(`ERR: auth - login = ${error}`)
-      return res.status(422).send({ status: false, statusCode: 422, message: error.message })
+      next(error)
     }
   }
 }
