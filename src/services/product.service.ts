@@ -78,8 +78,7 @@ class ProductService {
       })
     } catch (error: any) {
       if (error instanceof PrismaClientKnownRequestError && error.code === "P2003") {
-        // throw new DatabaseErrorConstraint(error.name, error.code, error.message)
-        throw new Error("Foreign key constraint failed on the field or not found")
+        throw new DatabaseErrorConstraint(error.name, `Foreign key constraint '${error.meta?.field_name}' not found`)
       }
       throw error
     }
@@ -96,7 +95,7 @@ class ProductService {
       })
     } catch (error: any) {
       if (error instanceof PrismaClientKnownRequestError && error.code === "P2003") {
-        throw new Error("Foreign key constraint failed on the field or not found")
+        throw new DatabaseErrorConstraint(error.name, `Foreign key constraint '${error.meta?.field_name}' not found`)
       }
       throw error
     }
