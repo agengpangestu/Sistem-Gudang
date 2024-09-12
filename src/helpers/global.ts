@@ -31,7 +31,6 @@ export const GlobalError = (err: Error, req: Request, res: Response, next: NextF
     return res.status(422).json({
       status: false,
       name: err.name,
-      code: err.code,
       message: err.message.replace(/\"/g, ""),
       statusCode: 422
     })
