@@ -11,7 +11,7 @@ prisma/migrations
 coverage
 
 #production
-# build
+build
 dist
 
 #mist
