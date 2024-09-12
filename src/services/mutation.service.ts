@@ -2,6 +2,7 @@ import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library"
 import { MutationType } from "../types/mutation.type"
 import { mutation_type } from "@prisma/client"
 import PrismaUtils from "../utils/prisma"
+import DatabaseErrorConstraint from "../helpers/database"
 
 class MutationService {
   private prisma: PrismaUtils
@@ -81,7 +82,7 @@ class MutationService {
       return await this.prisma.mutations.create({ data: payload })
     } catch (error: any) {
       if (error instanceof PrismaClientKnownRequestError && error.code === "P2003") {
-        throw new Error("Foreign key constraint failed on the field or not found")
+        throw new DatabaseErrorConstraint(error.name, `Foreign key constraint '${error.meta?.field_name}' not found`)
       }
       throw error
     }
@@ -97,7 +98,7 @@ class MutationService {
       return await this.prisma.mutations.update({ where: { id: id }, data: payload })
     } catch (error: any) {
       if (error instanceof PrismaClientKnownRequestError && error.code === "P2003") {
-        throw new Error("Foreign key constraint failed on the field or not found")
+        throw new DatabaseErrorConstraint(error.name, `Foreign key constraint '${error.meta?.field_name}' not found`)
       }
       throw error
     }
