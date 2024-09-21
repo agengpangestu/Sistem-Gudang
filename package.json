@@ -11,7 +11,8 @@
     "test-jest": "jest --detectOpenHandles",
     "test": "echo \"Error: no test specified\" && exit 1",
     "prge": "npx prisma generate",
-    "prmi": "npx prisma migrate dev"
+    "prmi": "npx prisma migrate dev",
+    "st": "npx prisma studio"
   },
   "author": "Ageng Pangestu",
   "license": "ISC",
@@ -37,6 +38,7 @@
   },
   "dependencies": {
     "@prisma/client": "^5.18.0",
+    "@supabase/supabase-js": "^2.45.4",
     "bcrypt": "^5.1.1",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
