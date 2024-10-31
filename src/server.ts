@@ -1,5 +1,5 @@
-import { logger } from "./utils/logger"
 import createServer from "./utils/server"
+import { logger } from "./utils"
 
 const app = createServer()
 const PORT: number = 4000
