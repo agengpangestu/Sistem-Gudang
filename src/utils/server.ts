@@ -11,7 +11,10 @@ const createServer = () => {
   app.use(express.urlencoded({ extended: false }))
   app.use(express.json())
 
-  app.use(cors())
+  app.use(cors({
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE"]
+  }))
   app.use((req, res, next) => {
     res.setHeader("Access-Control-Allow-Origin", "*")
     res.setHeader("Access-Control-Allow-Methods", "*")
