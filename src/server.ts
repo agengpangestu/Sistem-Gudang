@@ -1,5 +1,6 @@
-import createServer from "./utils/server"
+import CONFIG from "./config/environment"
 import { logger } from "./utils"
+import createServer from "./utils/server"
 
 const app = createServer()
 const PORT: number = 4000

@@ -1,6 +1,7 @@
 import Joi from "joi"
 import UserType from "../types/user.type"
 import { user_role } from "@prisma/client"
+import { z } from "zod"
 
 export const RegisterValidation = (payload: UserType) => {
   const schema = Joi.object({
@@ -22,3 +23,11 @@ export const LoginValidation = (payload: UserType) => {
 
   return schema.validate(payload)
 }
+
+// schema using zod
+export const loginSchema = z
+  .object({
+    email: z.string({required_error: "Email is required"}).email({message: "Invalid email address"}),
+    password: z.string({required_error: "Password is Required"}).min(8, {message: "Password length should be more than 8"})
+  })
+  .partial()
