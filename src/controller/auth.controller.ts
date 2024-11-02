@@ -1,11 +1,12 @@
 import { v4 as uuidV4 } from "uuid"
 
 import { NextFunction, Request, Response } from "express"
-import { LoginValidation, RegisterValidation } from "../validation/auth.validation"
-import { logger } from "../utils/logger"
-import { decrypt, encrypt } from "../utils/bcrypt"
 import authService from "../services/auth.service"
+import { joiError } from "../utils/"
+import { decrypt, encrypt } from "../utils/bcrypt"
 import { signJwt } from "../utils/jwt"
+import { logger } from "../utils/logger"
+import { LoginValidation, RegisterValidation } from "../validation/auth.validation"
 
 class AuthController {
   public async Register(req: Request, res: Response, next: NextFunction) {
@@ -33,7 +34,12 @@ class AuthController {
 
     if (error) {
       logger.error(`ERR: auth - login = ${error.message}`)
-      return res.status(422).send({ status: false, statusCode: 422, message: error.message.replace(/\"/g, "") })
+      return res.status(422).send({
+        status: false,
+        statusCode: 422,
+        message: error.name,
+        error_validation: joiError(error.details)
+      })
     }
     try {
       const user: any = await authService.Login(value.email)
@@ -48,11 +54,18 @@ class AuthController {
 
       const access_token = signJwt({ ...user }, { expiresIn: "1d" })
 
+      res.cookie("accessToken", access_token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        priority: "high",
+        maxAge: 86400000
+      })
       return res.status(200).send({
         status: true,
         statusCode: 200,
         message: "Success login",
-        data: { access_token: access_token, refresh_token: "3408fhdfdjfhbd" }
+        data: { access_token: access_token, refresh_token: "3408fhdfdjfhbd" },
+        user
       })
     } catch (error: any) {
       logger.error(`ERR: auth - login = ${error}`)
