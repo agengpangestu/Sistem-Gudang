@@ -1,4 +1,3 @@
-import { Prisma } from "@prisma/client"
 import AuthRegisterType from "../types/auth.type"
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library"
 import UserType from "../types/user.type"
@@ -29,7 +28,10 @@ class AuthService {
 
   public async Login(email: string): Promise<any> {
     try {
-      return await this.prisma.users.findUnique({ where: { email: email } })
+      return await this.prisma.users.findUnique({
+        where: { email: email },
+        select: { id: true, name: true, role: true, password: true }
+      })
     } catch (error) {
       throw error
     }

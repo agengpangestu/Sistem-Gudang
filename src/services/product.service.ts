@@ -73,14 +73,15 @@ class ProductService {
       return await this.prisma.products.create({
         data: {
           ...payload,
-          price: new Decimal(payload.price)
+          price: new Decimal(payload.price),
+          product_code: Number(payload.product_code),
+          user_id: Number(payload.user_id)
         }
       })
     } catch (error: any) {
       if (error instanceof PrismaClientKnownRequestError && error.code === "P2002") {
         throw new DatabaseErrorConstraint(error.name, `field: '${error.meta?.target}' must unique`)
-      }
-      else if (error instanceof PrismaClientKnownRequestError && error.code === "P2003") {
+      } else if (error instanceof PrismaClientKnownRequestError && error.code === "P2003") {
         throw new DatabaseErrorConstraint(error.name, `Foreign key constraint '${error.meta?.field_name}' not found`)
       }
       throw error
