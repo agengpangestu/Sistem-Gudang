@@ -58,15 +58,7 @@ class AuthController {
 
       // set token to header
       // set user to header too
-      res
-        .cookie("accessToken", access_token, {
-          httpOnly: true,
-          secure: true,
-          priority: "high",
-          maxAge: 86400000
-        })
-        .send()
-
+      res.cookie("accessToken", access_token).cookie("accessClient", user).send()
     } catch (error: any) {
       logger.error(`ERR: auth - login = ${error}`)
       next(error)
