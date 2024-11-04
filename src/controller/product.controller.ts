@@ -1,11 +1,11 @@
 import { NextFunction, Request, Response } from "express"
-import { ProductUpdateValidation, ProductValidation } from "../validation/product..validation"
 import { v4 as uuidV4 } from "uuid"
-import { logger } from "../utils/logger"
-import { ProductType } from "../types/product.type"
-import ProductService from "../services/product.service"
-import ErrorNotFound from "../helpers/not.found"
 import JoiError from "../helpers/joi"
+import ErrorNotFound from "../helpers/not.found"
+import ProductService from "../services/product.service"
+import { ProductType } from "../types/product.type"
+import { logger } from "../utils/logger"
+import { ProductUpdateValidation, ProductValidation } from "../validation/product..validation"
 
 class ProductController {
   private productService: ProductService
