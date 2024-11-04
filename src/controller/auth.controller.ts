@@ -2,7 +2,7 @@ import { v4 as uuidV4 } from "uuid"
 
 import { NextFunction, Request, Response } from "express"
 import authService from "../services/auth.service"
-import { joiError } from "../utils/"
+import { joiError, prisma } from "../utils/"
 import { decrypt, encrypt } from "../utils/bcrypt"
 import { signJwt } from "../utils/jwt"
 import { logger } from "../utils/logger"
@@ -33,7 +33,7 @@ class AuthController {
     const { error, value } = LoginValidation(req.body)
 
     if (error) {
-      logger.error(`ERR: auth - login = ${error.message}`)
+      logger.error(`ERR Validation: auth - login = ${error.message}`)
       return res.status(422).send({
         status: false,
         statusCode: 422,
@@ -43,30 +43,30 @@ class AuthController {
     }
     try {
       const user: any = await authService.Login(value.email)
+      const password = await prisma.user.findUnique({ where: { email: value.email } })
+
       if (!user) {
         return res.status(422).send({ status: false, statusCode: 422, message: "Email not registered" })
       }
 
-      const matching_password = decrypt(value.password, user.password)
+      const matching_password = decrypt(value.password, password?.password as string)
       if (!matching_password) {
         return res.status(422).send({ status: false, statusCode: 422, message: "Password not match" })
       }
 
       const access_token = signJwt({ ...user }, { expiresIn: "1d" })
 
-      res.cookie("accessToken", access_token, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        priority: "high",
-        maxAge: 86400000
-      })
-      return res.status(200).send({
-        status: true,
-        statusCode: 200,
-        message: "Success login",
-        data: { access_token: access_token, refresh_token: "3408fhdfdjfhbd" },
-        user
-      })
+      // set token to header
+      // set user to header too
+      res
+        .cookie("accessToken", access_token, {
+          httpOnly: true,
+          secure: true,
+          priority: "high",
+          maxAge: 86400000
+        })
+        .send()
+
     } catch (error: any) {
       logger.error(`ERR: auth - login = ${error}`)
       next(error)
