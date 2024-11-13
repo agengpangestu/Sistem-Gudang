@@ -58,12 +58,14 @@ class AuthController {
 
       // set token to header
       // set user to header too
-      res.cookie("accessToken", access_token).cookie("accessClient", user).send()
+      res.cookie("accessToken", access_token, { httpOnly: false, secure: true, maxAge: 86400000 }).send(user)
     } catch (error: any) {
       logger.error(`ERR: auth - login = ${error}`)
       next(error)
     }
   }
+
+  public async LogOut(req: Request, res: Response, next: NextFunction) {}
 }
 
 export default new AuthController()
