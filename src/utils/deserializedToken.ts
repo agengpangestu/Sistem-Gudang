@@ -12,6 +12,7 @@ const deserializedToken = async (req: Request, res: Response, next: NextFunction
   }
 
   const token: any = verifyJwt(headerSecret)
+  console.log(typeof token)
 
   if (token.decoded) {
     res.locals.user = token.decoded
