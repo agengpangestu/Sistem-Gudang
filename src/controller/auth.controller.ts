@@ -9,6 +9,7 @@ import { logger } from "../utils/logger"
 import { LoginValidation, RegisterValidation } from "../validation/auth.validation"
 import ErrorAuth from "../helpers/error.auth"
 import ErrorValidation from "../helpers/error.validation"
+import successResponse from "../utils/ok.response"
 
 class AuthController {
   public async Register(req: Request, res: Response, next: NextFunction) {
@@ -17,14 +18,13 @@ class AuthController {
 
     try {
       if (error) {
-        logger.error(`ERR: auth - register = ${error.message}`)
         throw next(new ErrorValidation("Error Validation", joiError(error.details)))
       }
 
       value.password = `${encrypt(value.password)}`
 
       await authService.Register(value)
-      return res.status(201).send({ status: true, statusCode: 201, message: "Register success" })
+      return successResponse(res, 201, "Register success")
     } catch (error: any) {
       logger.error(`ERR: auth - register = ${error}`)
       next(error)
