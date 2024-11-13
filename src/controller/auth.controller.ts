@@ -1,4 +1,4 @@
-import { v4 as uuidV4 } from "uuid"
+import { v7 as uuidV7 } from "uuid"
 
 import { NextFunction, Request, Response } from "express"
 import authService from "../services/auth.service"
@@ -12,15 +12,15 @@ import ErrorValidation from "../helpers/error.validation"
 
 class AuthController {
   public async Register(req: Request, res: Response, next: NextFunction) {
-    req.body.user_id = uuidV4()
+    req.body.user_id = uuidV7()
     const { error, value } = RegisterValidation(req.body)
 
-    if (error) {
-      logger.error(`ERR: auth - register = ${error.message}`)
-      return res.status(422).send({ status: false, statusCode: 422, message: error.message.replace(/\"/g, "") })
-    }
-
     try {
+      if (error) {
+        logger.error(`ERR: auth - register = ${error.message}`)
+        throw next(new ErrorValidation("Error Validation", joiError(error.details)))
+      }
+
       value.password = `${encrypt(value.password)}`
 
       await authService.Register(value)
