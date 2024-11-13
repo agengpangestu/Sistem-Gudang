@@ -2,14 +2,13 @@ import { v7 as uuidV7 } from "uuid"
 
 import { NextFunction, Request, Response } from "express"
 import authService from "../services/auth.service"
-import { joiError, prisma } from "../utils/"
+import { joiError, prisma, successResponse } from "../utils/"
 import { decrypt, encrypt } from "../utils/bcrypt"
 import { signJwt } from "../utils/jwt"
 import { logger } from "../utils/logger"
 import { LoginValidation, RegisterValidation } from "../validation/auth.validation"
 import ErrorAuth from "../helpers/error.auth"
 import ErrorValidation from "../helpers/error.validation"
-import successResponse from "../utils/ok.response"
 
 class AuthController {
   public async Register(req: Request, res: Response, next: NextFunction) {
