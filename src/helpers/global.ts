@@ -34,7 +34,8 @@ export const GlobalError = (err: Error, req: Request, res: Response, next: NextF
       status: false,
       name: err.name,
       message: err.message.replace(/\"/g, ""),
-      statusCode: 422
+      statusCode: 422,
+      error: err.error
     })
   } else if (err instanceof ErrorValidation) {
     return res.status(422).json({
