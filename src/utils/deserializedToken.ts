@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express"
 import { verifyJwt } from "./jwt"
 
-const deserializedToken = async (req: Request, res: Response, next: NextFunction) => {
+export const deserializedToken = async (req: Request, res: Response, next: NextFunction) => {
   const token_cookie = req.headers.cookie?.split("=")[1]
   const tokens = req.headers.cookie?.split("; ")
   // const access_token = req.headers.authorization?.replace(/^Bearer\s/, "")
@@ -24,5 +24,3 @@ const deserializedToken = async (req: Request, res: Response, next: NextFunction
 
   return next()
 }
-
-export default deserializedToken

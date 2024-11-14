@@ -6,5 +6,3 @@ export const successResponse = (res: Response, statusCode: number, message: stri
     data: data
   })
 }
-
-// export default successResponse
