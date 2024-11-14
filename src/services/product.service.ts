@@ -80,9 +80,13 @@ class ProductService {
       })
     } catch (error: any) {
       if (error instanceof PrismaClientKnownRequestError && error.code === "P2002") {
-        throw new DatabaseErrorConstraint(error.name, `field: '${error.meta?.target}' must unique`)
+        throw new DatabaseErrorConstraint(error.name, "Error Database", `field: '${error.meta?.target}' must unique`)
       } else if (error instanceof PrismaClientKnownRequestError && error.code === "P2003") {
-        throw new DatabaseErrorConstraint(error.name, `Foreign key constraint '${error.meta?.field_name}' not found`)
+        throw new DatabaseErrorConstraint(
+          error.name,
+          "Error Database",
+          `Foreign key constraint '${error.meta?.field_name}' not found`
+        )
       }
       throw error
     }
@@ -99,7 +103,11 @@ class ProductService {
       })
     } catch (error: any) {
       if (error instanceof PrismaClientKnownRequestError && error.code === "P2003") {
-        throw new DatabaseErrorConstraint(error.name, `Foreign key constraint '${error.meta?.field_name}' not found`)
+        throw new DatabaseErrorConstraint(
+          error.name,
+          "Error Database",
+          `Foreign key constraint '${error.meta?.field_name}' not found`
+        )
       }
       throw error
     }
