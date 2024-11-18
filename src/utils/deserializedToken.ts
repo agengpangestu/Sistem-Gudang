@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express"
 import { verifyJwt } from "./jwt"
 
-const deserializedToken = async (req: Request, res: Response, next: NextFunction) => {
+export const deserializedToken = async (req: Request, res: Response, next: NextFunction) => {
   const token_cookie = req.headers.cookie?.split("=")[1]
   const tokens = req.headers.cookie?.split("; ")
   // const access_token = req.headers.authorization?.replace(/^Bearer\s/, "")
@@ -12,7 +12,6 @@ const deserializedToken = async (req: Request, res: Response, next: NextFunction
   }
 
   const token: any = verifyJwt(headerSecret)
-  console.log(typeof token)
 
   if (token.decoded) {
     res.locals.user = token.decoded
@@ -25,5 +24,3 @@ const deserializedToken = async (req: Request, res: Response, next: NextFunction
 
   return next()
 }
-
-export default deserializedToken
