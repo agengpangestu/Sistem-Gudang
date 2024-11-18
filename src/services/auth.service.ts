@@ -3,8 +3,9 @@ import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library"
 import UserType from "../types/user.type"
 import PrismaUtils from "../utils/prisma"
 import DatabaseErrorConstraint from "../helpers/database"
+import AuthLogin from "../types/auth.type"
 
-class AuthService {
+export class AuthService {
   private prisma: PrismaUtils
 
   constructor() {
@@ -26,16 +27,15 @@ class AuthService {
     }
   }
 
-  public async Login(email: string): Promise<any> {
+  public async Login(email: string): Promise<AuthLogin | null> {
     try {
-      return await this.prisma.users.findUnique({
-        where: { email: email },
-        select: { id: true, name: true, role: true, password: true }
+      const user = await this.prisma.users.findUnique({
+        where: { email: email }
       })
+      return user
     } catch (error) {
+      console.log(error)
       throw error
     }
   }
 }
-
-export default new AuthService()
