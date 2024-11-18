@@ -7,7 +7,7 @@ import { ProductType } from "../types/product.type"
 import { logger } from "../utils/logger"
 import { ProductUpdateValidation, ProductValidation } from "../validation/product..validation"
 
-class ProductController {
+export class ProductController {
   private productService: ProductService
 
   constructor() {
@@ -115,5 +115,3 @@ class ProductController {
     }
   }
 }
-
-export default ProductController

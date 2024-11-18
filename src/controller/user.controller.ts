@@ -4,7 +4,7 @@ import { UserValidation } from "../validation/user.validation"
 import UserType from "../types/user.type"
 import UserService from "../services/user.service"
 
-class UserController {
+export class UserController {
   private userService: UserService
 
   constructor() {
@@ -95,5 +95,3 @@ class UserController {
     }
   }
 }
-
-export default UserController

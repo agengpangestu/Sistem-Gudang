@@ -3,7 +3,7 @@ import { logger } from "../utils/logger"
 import { ProductType } from "../types/product.type"
 import QuantityService from "../services/quantity.service"
 
-class QuantityController {
+export class QuantityController {
   private quantityService: QuantityService
   constructor() {
     this.quantityService = new QuantityService()
@@ -44,5 +44,3 @@ class QuantityController {
     }
   }
 }
-
-export default QuantityController

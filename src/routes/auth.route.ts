@@ -1,6 +1,7 @@
 import { Router } from "express"
-import authController from "../controller/auth.controller"
+import { AuthController } from "../controller"
 
+const authController = new AuthController()
 export const AuthRoute: Router = Router()
 
 AuthRoute.post("/registration", authController.Register)

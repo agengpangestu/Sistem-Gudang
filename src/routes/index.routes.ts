@@ -1,11 +1,13 @@
 import { Application, Router } from "express"
-import { UserRoute } from "./user.route"
-import { HealthRoute } from "./health.route"
-import { AuthRoute } from "./auth.route"
-import { ProductRoute } from "./product.route"
-import { MutationRoute } from "./mutation.route"
-import { QuantityRoute } from "./quantity.route"
-import { FakerRoute } from "./faker.route"
+import { 
+  UserRoute,
+  HealthRoute,
+  AuthRoute,
+  ProductRoute,
+  MutationRoute, 
+  QuantityRoute,
+  FakerRoute
+} from "./"
 
 const _routes: Array<[string, Router]> = [
   ["/api/health", HealthRoute],

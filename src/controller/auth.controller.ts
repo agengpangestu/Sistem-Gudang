@@ -10,7 +10,7 @@ import { LoginValidation, RegisterValidation } from "../validation/auth.validati
 import ErrorAuth from "../helpers/error.auth"
 import ErrorValidation from "../helpers/error.validation"
 
-class AuthController {
+export class AuthController {
   public async Register(req: Request, res: Response, next: NextFunction) {
     req.body.user_id = uuidV7()
     const { error, value } = RegisterValidation(req.body)
@@ -61,5 +61,3 @@ class AuthController {
     }
   }
 }
-
-export default new AuthController()

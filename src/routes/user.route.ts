@@ -1,6 +1,6 @@
 import { Router } from "express"
 import { RequiredAdmin } from "../middleware/auth"
-import UserController from "../controller/user.controller"
+import { UserController } from "../controller/user.controller"
 
 const userController = new UserController()
 export const UserRoute: Router = Router()
