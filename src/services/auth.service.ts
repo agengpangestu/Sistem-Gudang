@@ -19,7 +19,7 @@ class AuthService {
         if (error) {
           let err = error.meta?.target as any
           const a = err.map((e: any) => e)
-          throw new DatabaseErrorConstraint(error.name, `field: '${a}' must unique or registered`)
+          throw new DatabaseErrorConstraint(error.name, "Error Database", `field: '${a}' must unique or registered`)
         }
       }
       throw error

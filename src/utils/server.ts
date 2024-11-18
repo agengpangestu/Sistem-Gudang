@@ -3,7 +3,7 @@ import "dotenv/config"
 import express, { Application } from "express"
 import { GlobalError } from "../helpers/global"
 import { routes } from "../routes/index.routes"
-import deserializedToken from "./deserializedToken"
+import { deserializedToken } from "./"
 
 const createServer = () => {
   const app: Application = express()

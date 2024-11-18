@@ -3,6 +3,8 @@ import Unauthorized from "./unauthorized"
 import ErrorNotFound from "./not.found"
 import JoiError from "./joi"
 import DatabaseErrorConstraint from "./database"
+import ErrorAuth from "./error.auth"
+import ErrorValidation from "./error.validation"
 
 export const GlobalError = (err: Error, req: Request, res: Response, next: NextFunction) => {
   if (err instanceof Unauthorized) {
@@ -32,7 +34,21 @@ export const GlobalError = (err: Error, req: Request, res: Response, next: NextF
       status: false,
       name: err.name,
       message: err.message.replace(/\"/g, ""),
-      statusCode: 422
+      statusCode: 422,
+      error: err.error
+    })
+  } else if (err instanceof ErrorValidation) {
+    return res.status(422).json({
+      status: false,
+      message: err.message,
+      error: err.error
+    })
+  } else if (err instanceof ErrorAuth) {
+    return res.status(422).json({
+      status: false,
+      name: err.name,
+      message: err.message,
+      error: err.error
     })
   } else {
     return res.status(500).json({
