@@ -1,8 +1,11 @@
 import { Router } from "express"
 import { ProductController } from "../controller/product.controller"
 import { RequiredAdmin } from "../middleware/auth"
+import PrismaUtils from "../utils/prisma"
+import ProductService from "../services/product.service"
 
-const productController = new ProductController()
+const prisma = new PrismaUtils()
+const productController = new ProductController(new ProductService(prisma))
 export const ProductRoute: Router = Router()
 
 ProductRoute.get("/", productController.GetAll)
