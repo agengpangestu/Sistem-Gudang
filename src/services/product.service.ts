@@ -4,47 +4,39 @@ import PrismaUtils from "../utils/prisma"
 import DatabaseErrorConstraint from "../helpers/database"
 
 class ProductService {
-  private prisma: PrismaUtils
-
-  constructor() {
-    this.prisma = new PrismaUtils()
-  }
+  constructor(private prisma: PrismaUtils) {}
 
   public async GetAll(query: ProductType): Promise<any> {
     const skip = (query.page - 1) * query.limit
     const take = query.limit
 
-    const products = await this.prisma.products.findMany({
-      select: {
-        product_id: true,
-        product_code: true,
-        product_name: true,
-        location: true,
-        price: true,
-        createdAt: true
-      },
-      where: {
-        product_name: { contains: query.product_name, mode: "insensitive" },
-        createdAt: {
-          gte: query.start_date ? new Date(new Date(query.start_date).setHours(0, 0, 0)) : undefined,
-          lt: query.end_date ? new Date(new Date(query.end_date).setHours(24, 59, 59)) : undefined
-        }
-      },
-      orderBy: { [query.sort_by || "price"]: query.sort_order || "asc" },
-      skip: skip,
-      take: take
-    })
+    const filters = {
+      product_name: query.product_name ? { contains: query.product_name, mode: "insensitive" } : undefined,
+      createdAt: {
+        gte: query.start_date ? new Date(new Date(query.start_date).setHours(0, 0, 0)) : undefined,
+        lt: query.end_date ? new Date(new Date(query.end_date).setHours(24, 59, 59)) : undefined
+      }
+    }
+    const select = {
+      product_id: true,
+      product_code: true,
+      product_name: true,
+      location: true,
+      price: true,
+      createdAt: true
+    }
+    const cleanFilters = Object.fromEntries(Object.entries(filters).filter(([_, value]) => value !== undefined))
 
-    const total_data = await this.prisma.products.count({
-      where: {
-        product_name: { contains: query.product_name, mode: "insensitive" },
-        createdAt: {
-          gte: query.start_date ? new Date(new Date(query.start_date).setHours(0, 0, 0)) : undefined,
-          lt: query.end_date ? new Date(new Date(query.end_date).setHours(24, 59, 59)) : undefined
-        }
-      },
-      orderBy: { [query.sort_by || "price"]: query.sort_order || "asc" }
-    })
+    const [products, total_data] = await Promise.all([
+      this.prisma.products.findMany({
+        select: select,
+        where: cleanFilters,
+        orderBy: { [query.sort_by || "price"]: query.sort_order || "asc" },
+        skip: skip,
+        take: take
+      }),
+      this.prisma.products.count({ where: cleanFilters })
+    ])
 
     return {
       total_data: total_data,

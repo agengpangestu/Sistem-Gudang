@@ -8,18 +8,10 @@ import { logger } from "../utils/logger"
 import { ProductUpdateValidation, ProductValidation } from "../validation/product..validation"
 
 export class ProductController {
-  private productService: ProductService
-
-  constructor() {
-    this.productService = new ProductService()
-    this.GetAll = this.GetAll.bind(this)
-    this.GetById = this.GetById.bind(this)
-    this.Store = this.Store.bind(this)
-    this.Update = this.Update.bind(this)
-    this.Destroy = this.Destroy.bind(this)
+  constructor(private productService: ProductService) {
   }
 
-  public async GetAll(req: Request, res: Response, next: NextFunction) {
+  public GetAll = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
     const query = req.query as unknown as ProductType
 
     try {
@@ -34,13 +26,13 @@ export class ProductController {
     }
   }
 
-  public async GetById(req: Request, res: Response, next: NextFunction) {
+  public GetById = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
     const {
       params: { id }
     } = req
 
     try {
-      const product: any = await this.productService.GetById(parseInt(id))
+      const product = await this.productService.GetById(parseInt(id))
 
       if (!product) {
         throw next(new ErrorNotFound())
