@@ -1,12 +1,12 @@
 import { Decimal, PrismaClientKnownRequestError } from "@prisma/client/runtime/library"
-import { ProductType } from "../types/product.type"
+import { ProductPaginationResponse, ProductQuery, ProductType } from "../types/product.type"
 import PrismaUtils from "../utils/prisma"
 import DatabaseErrorConstraint from "../helpers/database"
 
 class ProductService {
   constructor(private prisma: PrismaUtils) {}
 
-  public async GetAll(query: ProductType): Promise<any> {
+  public async GetAll(query: ProductQuery): Promise<ProductPaginationResponse> {
     const skip = (query.page - 1) * query.limit
     const take = query.limit
 
