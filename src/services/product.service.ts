@@ -1,5 +1,5 @@
 import { Decimal, PrismaClientKnownRequestError } from "@prisma/client/runtime/library"
-import { ProductPaginationResponse, ProductQuery, ProductType } from "../types/product.type"
+import { ProductDetail, ProductPaginationResponse, ProductQuery, ProductType } from "../types/product.type"
 import PrismaUtils from "../utils/prisma"
 import DatabaseErrorConstraint from "../helpers/database"
 
@@ -46,7 +46,7 @@ class ProductService {
     }
   }
 
-  public async GetById(product_code: number): Promise<any> {
+  public async GetById(product_code: number): Promise<ProductDetail | null> {
     return await this.prisma.products.findUnique({
       where: { product_code: product_code },
       include: {
