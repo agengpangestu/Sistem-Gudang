@@ -5,7 +5,8 @@ import ErrorNotFound from "../helpers/not.found"
 import ProductService from "../services/product.service"
 import { ProductStore, ProductType } from "../types/product.type"
 import { logger } from "../utils/logger"
-import { ProductUpdateValidation, ProductValidation } from "../validation/product..validation"
+import { ProductUpdateValidation } from "../validation/product.validation"
+import { successResponse } from "../utils"
 
 export class ProductController {
   constructor(private productService: ProductService) {}
@@ -45,9 +46,9 @@ export class ProductController {
 
   public Store = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
     try {
-      const payload: ProductStore = req.body
+      const payload = req.body as ProductStore
       await this.productService.Store(payload)
-      return res.status(201).send({ status: true, statusCode: 201, message: "Success create product" })
+      return successResponse(res, 201, "Success create product")
     } catch (error: any) {
       next(error)
     }
