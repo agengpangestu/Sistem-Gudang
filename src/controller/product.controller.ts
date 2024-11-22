@@ -1,15 +1,14 @@
 import { NextFunction, Request, Response } from "express"
-import { v4 as uuidV4 } from "uuid"
+import { v7 as uuidV7 } from "uuid"
 import JoiError from "../helpers/joi"
 import ErrorNotFound from "../helpers/not.found"
 import ProductService from "../services/product.service"
-import { ProductType } from "../types/product.type"
+import { ProductStore, ProductType } from "../types/product.type"
 import { logger } from "../utils/logger"
 import { ProductUpdateValidation, ProductValidation } from "../validation/product..validation"
 
 export class ProductController {
-  constructor(private productService: ProductService) {
-  }
+  constructor(private productService: ProductService) {}
 
   public GetAll = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
     const query = req.query as unknown as ProductType
@@ -44,17 +43,10 @@ export class ProductController {
     }
   }
 
-  public async Store(req: Request, res: Response, next: NextFunction) {
-    req.body.product_id = uuidV4()
-    const { error, value } = ProductValidation(req.body)
-
+  public Store = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
     try {
-      if (error) {
-        logger.error(`ERR: product - product create = ${error.message}`)
-        throw next(new JoiError(error.name, error.message))
-      }
-
-      await this.productService.Store(value)
+      const payload: ProductStore = req.body
+      await this.productService.Store(payload)
       return res.status(201).send({ status: true, statusCode: 201, message: "Success create product" })
     } catch (error: any) {
       next(error)
