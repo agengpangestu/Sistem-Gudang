@@ -1,5 +1,13 @@
 import { Decimal, PrismaClientKnownRequestError } from "@prisma/client/runtime/library"
-import { ProductDetail, ProductPaginationResponse, ProductQuery, ProductType } from "../types/product.type"
+import { v7 as uuidV7 } from "uuid"
+import {
+  Product,
+  ProductDetail,
+  ProductPaginationResponse,
+  ProductQuery,
+  ProductStore,
+  ProductType
+} from "../types/product.type"
 import PrismaUtils from "../utils/prisma"
 import DatabaseErrorConstraint from "../helpers/database"
 
@@ -60,15 +68,10 @@ class ProductService {
     })
   }
 
-  public async Store(payload: Omit<ProductType, "id">): Promise<ProductType | any> {
+  public async Store(payload: ProductStore): Promise<Product> {
     try {
       return await this.prisma.products.create({
-        data: {
-          ...payload,
-          price: new Decimal(payload.price),
-          product_code: Number(payload.product_code),
-          user_id: Number(payload.user_id)
-        }
+        data: { ...payload, product_id: uuidV7() }
       })
     } catch (error: any) {
       if (error instanceof PrismaClientKnownRequestError && error.code === "P2002") {
