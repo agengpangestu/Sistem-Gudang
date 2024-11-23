@@ -11,13 +11,9 @@ export const ProductValidation = Joi.object({
   user_id: Joi.number().required()
 }).options({ abortEarly: false })
 
-export const ProductUpdateValidation = (payload: ProductType) => {
-  const schema = Joi.object({
-    product_name: Joi.string(),
-    desc: Joi.string(),
-    location: Joi.string(),
-    price: Joi.number()
-  }).options({ abortEarly: false })
-
-  return schema.validate(payload)
-}
+export const ProductUpdateValidation = Joi.object({
+  product_name: Joi.string(),
+  desc: Joi.string(),
+  location: Joi.string(),
+  price: Joi.number()
+}).options({ abortEarly: false })
