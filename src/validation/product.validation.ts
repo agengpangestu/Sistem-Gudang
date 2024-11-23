@@ -7,7 +7,7 @@ export const ProductValidation = Joi.object({
   product_name: Joi.string().required(),
   desc: Joi.string(),
   location: Joi.string().required(),
-  price: Joi.string().regex(/^\d+(\.\d{1,2})?$/),
+  price: Joi.number(),
   user_id: Joi.number().required()
 }).options({ abortEarly: false })
 
@@ -16,8 +16,7 @@ export const ProductUpdateValidation = (payload: ProductType) => {
     product_name: Joi.string(),
     desc: Joi.string(),
     location: Joi.string(),
-    price: Joi.string().regex(/^\d+(\.\d{1,2})?$/),
-    user_id: Joi.number()
+    price: Joi.number()
   }).options({ abortEarly: false })
 
   return schema.validate(payload)
