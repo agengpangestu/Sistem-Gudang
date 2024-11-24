@@ -6,7 +6,8 @@ import {
   ProductPaginationResponse,
   ProductQuery,
   ProductStore,
-  ProductType
+  ProductType,
+  ProductUpdate
 } from "../types/product.type"
 import PrismaUtils from "../utils/prisma"
 import DatabaseErrorConstraint from "../helpers/database"
@@ -87,14 +88,11 @@ class ProductService {
     }
   }
 
-  public async Update(product_code: number, payload: Omit<ProductType, "product_id">): Promise<ProductType | any> {
+  public async Update(product_code: number, payload: ProductUpdate): Promise<Product> {
     try {
       return await this.prisma.products.update({
         where: { product_code: product_code },
-        data: {
-          ...payload,
-          price: new Decimal(payload.price)
-        }
+        data: payload
       })
     } catch (error: any) {
       if (error instanceof PrismaClientKnownRequestError && error.code === "P2003") {
