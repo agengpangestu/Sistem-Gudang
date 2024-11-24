@@ -1,28 +1,24 @@
-import { v7 as uuidV7 } from "uuid"
-
 import { NextFunction, Request, Response } from "express"
-import authService from "../services/auth.service"
-import { joiError, prisma, successResponse } from "../utils/"
+import { AuthService } from "../services/"
+import { joiError, successResponse } from "../utils/"
 import { decrypt, encrypt } from "../utils/bcrypt"
 import { signJwt } from "../utils/jwt"
 import { logger } from "../utils/logger"
-import { LoginValidation, RegisterValidation } from "../validation/auth.validation"
+import { LoginValidation } from "../validation/auth.validation"
 import ErrorAuth from "../helpers/error.auth"
 import ErrorValidation from "../helpers/error.validation"
+import AuthRegister, { AuthLogin } from "../types/auth.type"
+
+// const authService = new AuthService()
 
 export class AuthController {
-  public async Register(req: Request, res: Response, next: NextFunction) {
-    req.body.user_id = uuidV7()
-    const { error, value } = RegisterValidation(req.body)
-
+  constructor(private authService: AuthService) {}
+  public Register = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
     try {
-      if (error) {
-        throw next(new ErrorValidation("Error Validation", joiError(error.details)))
-      }
+      const payload = req.body as AuthRegister
+      payload.password = `${encrypt(payload.password)}`
 
-      value.password = `${encrypt(value.password)}`
-
-      await authService.Register(value)
+      await this.authService.Register(payload)
       return successResponse(res, 201, "Register success")
     } catch (error: any) {
       logger.error(`ERR: auth - register = ${error}`)
@@ -30,32 +26,28 @@ export class AuthController {
     }
   }
 
-  public async Login(req: Request, res: Response, next: NextFunction) {
-    const { error, value } = LoginValidation(req.body)
-
+  public Login = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
     try {
-      if (error) {
-        logger.error(`ERR Validation: auth - login = ${error.message}`)
-        throw next(new ErrorValidation("Error Validation", joiError(error.details)))
-      }
+      const payload = req.body as AuthLogin
 
-      const user: any = await authService.Login(value.email)
-      const password = await prisma.user.findUnique({ where: { email: value.email } })
-
+      const user = await this.authService.Login(payload.email)
       if (!user) {
         throw next(new ErrorAuth("Error login", "Email not registered"))
       }
 
-      const matching_password = decrypt(value.password, password?.password as string)
+      const matching_password = decrypt(payload.password, user.password)
       if (!matching_password) {
         throw next(new ErrorAuth("Error login", "Password not match"))
       }
 
       const access_token = signJwt({ ...user }, { expiresIn: "1d" })
+      const send_user = {
+        id: user.id,
+        name: user.name,
+        role: user.role
+      }
 
-      // set token to header
-      // set user to header too
-      res.cookie("accessToken", access_token).send(user)
+      return res.cookie("accessToken", access_token).send(send_user)
     } catch (error: any) {
       next(error)
     }
