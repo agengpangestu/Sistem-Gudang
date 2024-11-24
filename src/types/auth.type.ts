@@ -11,10 +11,19 @@ export default interface AuthRegisterType {
   updatedAt: Date
 }
 
-export default interface AuthLogin {
+export interface AuthLogin {
   id: number
   user_id: string
   name: string
+  email: string
   role: user_role
   password: string
+}
+
+export interface AuthRegister {
+  user_id: string
+  name: string
+  email: string
+  password: string
+  role: user_role
 }
