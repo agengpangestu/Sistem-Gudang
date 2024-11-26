@@ -1,5 +1,5 @@
 import { user_role } from "@prisma/client"
-import { User, UserPaginationResponse, UserQuery, UserUpdate } from "../types/"
+import { User, UserDetail, UserPaginationResponse, UserQuery, UserUpdate } from "../types/"
 import PrismaUtils from "../utils/prisma"
 
 class UserService {
@@ -15,7 +15,7 @@ class UserService {
     } as object
 
     const select = {
-      user_id: true,
+      id: true,
       name: true,
       email: true,
       role: true,
@@ -43,14 +43,17 @@ class UserService {
     }
   }
 
-  public async GetById(id: any): Promise<any> {
+  public async GetById(id: number): Promise<UserDetail | null> {
     return await this.prisma.users.findUnique({
       where: { id: id },
       select: {
+        id: true,
         user_id: true,
         email: true,
         name: true,
-        role: true
+        role: true,
+        createdAt: true,
+        updatedAt: true
       }
     })
   }
