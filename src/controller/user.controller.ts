@@ -1,33 +1,30 @@
 import { logger } from "../utils/logger"
-import { Request, Response } from "express"
+import { NextFunction, Request, Response } from "express"
 import { UserValidation } from "../validation/user.validation"
 import UserType from "../types/user.type"
 import UserService from "../services/user.service"
+import { successResponse } from "../utils"
 
 export class UserController {
-  private userService: UserService
+  constructor(private userService: UserService) {}
 
-  constructor() {
-    this.userService = new UserService()
-    this.GetAll = this.GetAll.bind(this)
-    this.GetById = this.GetById.bind(this)
-    this.Update = this.Update.bind(this)
-    this.Destroy = this.Destroy.bind(this)
-  }
-
-  public async GetAll(req: Request, res: Response) {
+  public GetAll = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
     const query = req.query as unknown as UserType
 
-    query.page = parseInt(req.query.page as string) || 1
-    query.limit = parseInt(req.query.limit as string) || 10
+    try {
+      query.page = parseInt(req.query.page as string) || 1
+      query.limit = parseInt(req.query.limit as string) || 10
 
-    const data: any = await this.userService.GetAll(query)
+      const data: any = await this.userService.GetAll(query)
 
-    logger.info("Success get all users")
-    return res.status(200).json({ status: true, statusCode: 200, data: data })
+      logger.info("Success get all users")
+      return successResponse(res, 200, "OK", data)
+    } catch (error: any) {
+      next()
+    }
   }
 
-  public async GetById(req: Request, res: Response) {
+  public GetById = async (req: Request, res: Response) => {
     const {
       params: { id }
     } = req
@@ -42,7 +39,7 @@ export class UserController {
     return res.status(200).json({ status: true, statusCode: 200, data: user })
   }
 
-  public async Update(req: Request, res: Response) {
+  public Update = async (req: Request, res: Response) => {
     const {
       params: { id }
     } = req
@@ -73,7 +70,7 @@ export class UserController {
     }
   }
 
-  public async Destroy(req: Request, res: Response) {
+  public Destroy = async (req: Request, res: Response) => {
     const {
       params: { id }
     } = req
