@@ -1,11 +1,8 @@
 import { NextFunction, Request, Response } from "express"
-import { v7 as uuidV7 } from "uuid"
-import JoiError from "../helpers/joi"
 import ErrorNotFound from "../helpers/not.found"
 import ProductService from "../services/product.service"
 import { ProductStore, ProductType, ProductUpdate } from "../types/product.type"
 import { logger } from "../utils/logger"
-import { ProductUpdateValidation } from "../validation/product.validation"
 import { successResponse } from "../utils"
 
 export class ProductController {

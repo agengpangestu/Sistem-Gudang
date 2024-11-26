@@ -1,4 +1,4 @@
-import { Decimal, PrismaClientKnownRequestError } from "@prisma/client/runtime/library"
+import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library"
 import { v7 as uuidV7 } from "uuid"
 import {
   Product,
@@ -6,7 +6,6 @@ import {
   ProductPaginationResponse,
   ProductQuery,
   ProductStore,
-  ProductType,
   ProductUpdate
 } from "../types/product.type"
 import PrismaUtils from "../utils/prisma"
