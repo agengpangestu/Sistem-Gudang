@@ -14,6 +14,7 @@ export class ProductController {
     try {
       query.page = parseInt(req.query.page as string) || 1
       query.limit = parseInt(req.query.limit as string) || 10
+
       const data: any = await this.productService.GetAll(query)
 
       logger.info("Success get all products")
