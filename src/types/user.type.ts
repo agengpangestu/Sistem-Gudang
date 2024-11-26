@@ -30,7 +30,7 @@ export interface UserPaginationResponse {
 }
 
 export interface User {
-  user_id: string
+  id: number
   name: string
   email: string
   role: user_role
@@ -38,8 +38,8 @@ export interface User {
 }
 
 export interface UserDetail extends Partial<User> {
-  id: number
-  password: string
+  user_id: string
+  // password: string
   updatedAt: Date
 }
 
