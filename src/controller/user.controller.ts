@@ -4,6 +4,7 @@ import { UserValidation } from "../validation/user.validation"
 import UserType from "../types/user.type"
 import UserService from "../services/user.service"
 import { successResponse } from "../utils"
+import ErrorNotFound from "../helpers/not.found"
 
 export class UserController {
   constructor(private userService: UserService) {}
@@ -24,19 +25,23 @@ export class UserController {
     }
   }
 
-  public GetById = async (req: Request, res: Response) => {
+  public GetById = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
     const {
       params: { id }
     } = req
 
-    const user: any = await this.userService.GetById(parseInt(id))
+    try {
+      const user = await this.userService.GetById(parseInt(id))
 
-    if (!user) {
-      return res.status(404).json({ status: false, statusCode: 404, data: "User not found" })
+      if (!user) {
+        throw next(new ErrorNotFound())
+      }
+
+      logger.info("Success get user by id")
+      return successResponse(res, 200, "OK", user)
+    } catch (error: any) {
+      next()
     }
-
-    logger.info("Success get user by id")
-    return res.status(200).json({ status: true, statusCode: 200, data: user })
   }
 
   public Update = async (req: Request, res: Response) => {
