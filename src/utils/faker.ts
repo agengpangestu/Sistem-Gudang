@@ -1,11 +1,7 @@
-import { Decimal, PrismaClientKnownRequestError } from "@prisma/client/runtime/library"
 import { AuthRegister, ProductStore } from "../types/"
 import { Request, Response } from "express"
-import { v4 as uuidV4 } from "uuid"
 import { logger } from "./logger"
-import { ProductValidation } from "../validation/product.validation"
 import { faker } from "@faker-js/faker"
-import { RegisterValidation } from "../validation/auth.validation"
 import { FakerService } from "../services/faker.service"
 import { successResponse } from "./ok.response"
 
