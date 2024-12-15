@@ -1,33 +1,39 @@
 import { user_role } from "@prisma/client"
-import UserType from "../types/user.type"
+import { User, UserDetail, UserPaginationResponse, UserQuery, UserUpdate } from "../types/"
 import PrismaUtils from "../utils/prisma"
 
 class UserService {
-  private prisma: PrismaUtils
+  constructor(private prisma: PrismaUtils) {}
 
-  constructor() {
-    this.prisma = new PrismaUtils()
-  }
-
-  public async GetAll(query: UserType): Promise<any> {
+  public async GetAll(query: UserQuery): Promise<UserPaginationResponse> {
     const skip = (query.page - 1) * query.limit
     const take = query.limit
 
-    const users = await this.prisma.users.findMany({
-      where: {
-        name: { contains: query.name, mode: "insensitive" },
-        role: { equals: query.role }
-      },
-      skip: skip,
-      take: take
-    })
+    const filters = {
+      name: query.name ? { contains: query.name, mode: "insensitive" } : undefined,
+      role: query.role ? { equals: query.role } : undefined
+    } as object
 
-    const total_data = await this.prisma.users.count({
-      where: {
-        name: { contains: query.name, mode: "insensitive" },
-        role: { equals: query.role }
-      }
-    })
+    const select = {
+      id: true,
+      name: true,
+      email: true,
+      role: true,
+      createdAt: true
+    }
+
+    const [users, total_data] = await Promise.all([
+      this.prisma.users.findMany({
+        where: filters,
+        select: select,
+        skip: skip,
+        take: take
+      }),
+
+      this.prisma.users.count({
+        where: filters
+      })
+    ])
 
     return {
       total_data: total_data,
@@ -37,19 +43,22 @@ class UserService {
     }
   }
 
-  public async GetById(id: any): Promise<any> {
+  public async GetById(id: number): Promise<UserDetail | null> {
     return await this.prisma.users.findUnique({
       where: { id: id },
       select: {
+        id: true,
         user_id: true,
         email: true,
         name: true,
-        role: true
+        role: true,
+        createdAt: true,
+        updatedAt: true
       }
     })
   }
 
-  public async Update(id: number, payload: Omit<UserType, "user_id">): Promise<UserType | any> {
+  public async Update(id: number, payload: UserUpdate): Promise<User> {
     try {
       if (!Object.values(user_role).includes(payload.role)) {
         throw new Error(`Invalid role: ${payload.role}. Expected one of ${Object.values(user_role).join(", ")}.`)

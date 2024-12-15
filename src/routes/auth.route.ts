@@ -1,13 +1,13 @@
-import { NextFunction, Request, Response, Router } from "express"
-import authController from "../controller/auth.controller"
+import { Router } from "express"
+import { AuthController } from "../controller"
+import PrismaUtils from "../utils/prisma"
+import { AuthService } from "../services"
+import { ValidateError } from "../middleware"
+import { LoginValidation, RegisterValidation } from "../validation"
 
+const prisma = new PrismaUtils()
+const authController = new AuthController(new AuthService(prisma))
 export const AuthRoute: Router = Router()
 
-AuthRoute.post("/registration", authController.Register)
-AuthRoute.post("/login", authController.Login)
-AuthRoute.get("/logout", (req: Request, res: Response, next: NextFunction) => {
-  //   res.clearCookie("accessClient")
-  //   res.clearCookie("accessToken")
-  console.log(req.headers)
-  res.status(200).send("Cookie deleted")
-})
+AuthRoute.post("/registration", ValidateError(RegisterValidation), authController.Register)
+AuthRoute.post("/login", ValidateError(LoginValidation), authController.Login)

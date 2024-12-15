@@ -7,6 +7,8 @@ import ErrorAuth from "./error.auth"
 import ErrorValidation from "./error.validation"
 
 export const GlobalError = (err: Error, req: Request, res: Response, next: NextFunction) => {
+  console.log(err)
+
   if (err instanceof Unauthorized) {
     return res.status(401).json({
       status: false,

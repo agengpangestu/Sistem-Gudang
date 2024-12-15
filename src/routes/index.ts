@@ -1,0 +1,7 @@
+export * from "./auth.route"
+export * from "./faker.route"
+export * from "./health.route"
+export * from "./mutation.route"
+export * from "./product.route"
+export * from "./quantity.route"
+export * from "./user.route"

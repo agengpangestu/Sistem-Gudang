@@ -5,7 +5,7 @@ import { v4 as uuidV4 } from "uuid"
 import { MutationType } from "../types/mutation.type"
 import MutationService from "../services/mutation.service"
 
-class MutationController {
+export class MutationController {
   private mutationService: MutationService
 
   constructor() {
@@ -113,5 +113,3 @@ class MutationController {
     }
   }
 }
-
-export default MutationController

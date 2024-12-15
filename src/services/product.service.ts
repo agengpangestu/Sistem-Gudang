@@ -1,50 +1,50 @@
-import { Decimal, PrismaClientKnownRequestError } from "@prisma/client/runtime/library"
-import { ProductType } from "../types/product.type"
+import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library"
+import { v7 as uuidV7 } from "uuid"
+import {
+  Product,
+  ProductDetail,
+  ProductPaginationResponse,
+  ProductQuery,
+  ProductStore,
+  ProductUpdate
+} from "../types/product.type"
 import PrismaUtils from "../utils/prisma"
 import DatabaseErrorConstraint from "../helpers/database"
 
 class ProductService {
-  private prisma: PrismaUtils
+  constructor(private prisma: PrismaUtils) {}
 
-  constructor() {
-    this.prisma = new PrismaUtils()
-  }
-
-  public async GetAll(query: ProductType): Promise<any> {
+  public async GetAll(query: ProductQuery): Promise<ProductPaginationResponse> {
     const skip = (query.page - 1) * query.limit
     const take = query.limit
 
-    const products = await this.prisma.products.findMany({
-      select: {
-        product_id: true,
-        product_code: true,
-        product_name: true,
-        location: true,
-        price: true,
-        createdAt: true
-      },
-      where: {
-        product_name: { contains: query.product_name, mode: "insensitive" },
-        createdAt: {
-          gte: query.start_date ? new Date(new Date(query.start_date).setHours(0, 0, 0)) : undefined,
-          lt: query.end_date ? new Date(new Date(query.end_date).setHours(24, 59, 59)) : undefined
-        }
-      },
-      orderBy: { [query.sort_by || "price"]: query.sort_order || "asc" },
-      skip: skip,
-      take: take
-    })
+    const filters = {
+      product_name: query.product_name ? { contains: query.product_name, mode: "insensitive" } : undefined,
+      createdAt: {
+        gte: query.start_date ? new Date(new Date(query.start_date).setHours(0, 0, 0)) : undefined,
+        lt: query.end_date ? new Date(new Date(query.end_date).setHours(24, 59, 59)) : undefined
+      }
+    }
+    const select = {
+      product_id: true,
+      product_code: true,
+      product_name: true,
+      location: true,
+      price: true,
+      createdAt: true
+    }
+    const cleanFilters = Object.fromEntries(Object.entries(filters).filter(([_, value]) => value !== undefined))
 
-    const total_data = await this.prisma.products.count({
-      where: {
-        product_name: { contains: query.product_name, mode: "insensitive" },
-        createdAt: {
-          gte: query.start_date ? new Date(new Date(query.start_date).setHours(0, 0, 0)) : undefined,
-          lt: query.end_date ? new Date(new Date(query.end_date).setHours(24, 59, 59)) : undefined
-        }
-      },
-      orderBy: { [query.sort_by || "price"]: query.sort_order || "asc" }
-    })
+    const [products, total_data] = await Promise.all([
+      this.prisma.products.findMany({
+        select: select,
+        where: cleanFilters,
+        orderBy: { [query.sort_by || "price"]: query.sort_order || "asc" },
+        skip: skip,
+        take: take
+      }),
+      this.prisma.products.count({ where: cleanFilters })
+    ])
 
     return {
       total_data: total_data,
@@ -54,7 +54,7 @@ class ProductService {
     }
   }
 
-  public async GetById(product_code: number): Promise<any> {
+  public async GetById(product_code: number): Promise<ProductDetail | null> {
     return await this.prisma.products.findUnique({
       where: { product_code: product_code },
       include: {
@@ -68,15 +68,10 @@ class ProductService {
     })
   }
 
-  public async Store(payload: Omit<ProductType, "id">): Promise<ProductType | any> {
+  public async Store(payload: ProductStore): Promise<Product> {
     try {
       return await this.prisma.products.create({
-        data: {
-          ...payload,
-          price: new Decimal(payload.price),
-          product_code: Number(payload.product_code),
-          user_id: Number(payload.user_id)
-        }
+        data: { ...payload, product_id: uuidV7() }
       })
     } catch (error: any) {
       if (error instanceof PrismaClientKnownRequestError && error.code === "P2002") {
@@ -92,14 +87,11 @@ class ProductService {
     }
   }
 
-  public async Update(product_code: number, payload: Omit<ProductType, "product_id">): Promise<ProductType | any> {
+  public async Update(product_code: number, payload: ProductUpdate): Promise<Product> {
     try {
       return await this.prisma.products.update({
         where: { product_code: product_code },
-        data: {
-          ...payload,
-          price: new Decimal(payload.price)
-        }
+        data: payload
       })
     } catch (error: any) {
       if (error instanceof PrismaClientKnownRequestError && error.code === "P2003") {

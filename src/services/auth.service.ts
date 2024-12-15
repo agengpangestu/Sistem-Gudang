@@ -1,20 +1,21 @@
-import AuthRegisterType from "../types/auth.type"
-import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library"
-import UserType from "../types/user.type"
+import { v7 as uuidV7 } from "uuid"
+import { PrismaClientKnownRequestError, PrismaClientValidationError } from "@prisma/client/runtime/library"
 import PrismaUtils from "../utils/prisma"
 import DatabaseErrorConstraint from "../helpers/database"
+import { AuthRegister, AuthLogin } from "../types/"
 
-class AuthService {
-  private prisma: PrismaUtils
+export class AuthService {
+  constructor(private prisma: PrismaUtils) {}
 
-  constructor() {
-    this.prisma = new PrismaUtils()
-  }
-
-  public async Register(payload: Omit<AuthRegisterType, "id">): Promise<AuthRegisterType | any> {
+  public async Register(payload: AuthRegister): Promise<AuthRegister> {
     try {
-      return await this.prisma.users.create({ data: payload })
+      const register = await this.prisma.users.create({ data: { ...payload, user_id: uuidV7() } })
+      return register
     } catch (error: any) {
+      if (error instanceof PrismaClientValidationError) {
+        let err = error.name
+        throw new DatabaseErrorConstraint(err, "Error Database", "Role doesn't exist")
+      }
       if (error instanceof PrismaClientKnownRequestError && error.code === "P2002") {
         if (error) {
           let err = error.meta?.target as any
@@ -26,16 +27,15 @@ class AuthService {
     }
   }
 
-  public async Login(email: string): Promise<any> {
+  public async Login(email: string): Promise<AuthLogin | null> {
     try {
-      return await this.prisma.users.findUnique({
-        where: { email: email },
-        select: { id: true, name: true, role: true, password: true }
+      const user = await this.prisma.users.findUnique({
+        where: { email: email }
       })
+      return user
     } catch (error) {
+      console.log(error)
       throw error
     }
   }
 }
-
-export default new AuthService()
