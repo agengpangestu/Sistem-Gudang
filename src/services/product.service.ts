@@ -1,15 +1,15 @@
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library"
 import { v7 as uuidV7 } from "uuid"
+import DatabaseErrorConstraint from "../helpers/database"
 import {
   Product,
   ProductDetail,
   ProductPaginationResponse,
   ProductQuery,
   ProductStore,
-  ProductUpdate
+  ProductUpdate,
 } from "../types/product.type"
 import PrismaUtils from "../utils/prisma"
-import DatabaseErrorConstraint from "../helpers/database"
 
 class ProductService {
   constructor(private prisma: PrismaUtils) {}
@@ -22,16 +22,15 @@ class ProductService {
       product_name: query.product_name ? { contains: query.product_name, mode: "insensitive" } : undefined,
       createdAt: {
         gte: query.start_date ? new Date(new Date(query.start_date).setHours(0, 0, 0)) : undefined,
-        lt: query.end_date ? new Date(new Date(query.end_date).setHours(24, 59, 59)) : undefined
-      }
+        lt: query.end_date ? new Date(new Date(query.end_date).setHours(24, 59, 59)) : undefined,
+      },
     }
     const select = {
-      product_id: true,
-      product_code: true,
+      id: true,
       product_name: true,
       location: true,
       price: true,
-      createdAt: true
+      createdAt: true,
     }
     const cleanFilters = Object.fromEntries(Object.entries(filters).filter(([_, value]) => value !== undefined))
 
@@ -41,72 +40,72 @@ class ProductService {
         where: cleanFilters,
         orderBy: { [query.sort_by || "price"]: query.sort_order || "asc" },
         skip: skip,
-        take: take
+        take: take,
       }),
-      this.prisma.products.count({ where: cleanFilters })
+      this.prisma.products.count({ where: cleanFilters }),
     ])
 
     return {
       total_data: total_data,
       total_pages: Math.ceil(total_data / query.limit),
       current_page: query.page,
-      data: products
+      data: products,
     }
   }
 
-  public async GetById(product_code: number): Promise<ProductDetail | null> {
+  public async GetById(id: string): Promise<ProductDetail | null> {
     return await this.prisma.products.findUnique({
-      where: { product_code: product_code },
+      where: { id: id },
       include: {
         user: {
           select: {
             email: true,
-            name: true
-          }
-        }
-      }
+            name: true,
+          },
+        },
+      },
     })
   }
 
   public async Store(payload: ProductStore): Promise<Product> {
     try {
       return await this.prisma.products.create({
-        data: { ...payload, product_id: uuidV7() }
+        data: { ...payload, id: uuidV7() },
       })
-    } catch (error: any) {
+    } catch (error: unknown) {
       if (error instanceof PrismaClientKnownRequestError && error.code === "P2002") {
         throw new DatabaseErrorConstraint(error.name, "Error Database", `field: '${error.meta?.target}' must unique`)
       } else if (error instanceof PrismaClientKnownRequestError && error.code === "P2003") {
         throw new DatabaseErrorConstraint(
           error.name,
           "Error Database",
-          `Foreign key constraint '${error.meta?.field_name}' not found`
+          `Foreign key constraint '${error.meta?.field_name}' not found`,
         )
       }
       throw error
     }
   }
 
-  public async Update(product_code: number, payload: ProductUpdate): Promise<Product> {
+  public async Update(id: string, payload: ProductUpdate): Promise<Product> {
     try {
       return await this.prisma.products.update({
-        where: { product_code: product_code },
-        data: payload
+        where: { id: id },
+        data: payload,
       })
-    } catch (error: any) {
+    } catch (error: unknown) {
       if (error instanceof PrismaClientKnownRequestError && error.code === "P2003") {
         throw new DatabaseErrorConstraint(
           error.name,
           "Error Database",
-          `Foreign key constraint '${error.meta?.field_name}' not found`
+          `Foreign key constraint '${error.meta?.field_name}' not found`,
         )
       }
       throw error
     }
   }
 
-  public async Destroy(product_code: number): Promise<any> {
-    return await this.prisma.products.delete({ where: { product_code: product_code } })
+  public async Destroy(id: string): Promise<any> {
+    return await this.prisma.products.delete({ where: { id: id } })
   }
 }
 

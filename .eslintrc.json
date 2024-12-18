@@ -1,0 +1,18 @@
+{
+  "rules": {
+    "prettier/prettier": [
+      "error",
+      {
+        "arrowParens": "always",
+        "printWidth": 120,
+        "semi": false,
+        "singleQuote": false,
+        "trailingComma": "all",
+        "tabWidth": 2,
+        "bracketSpacing": true
+      }
+    ]
+  },
+  "plugins": ["jest", "prettier"],
+  "extends": ["standard-with-typescript", "prettier"]
+}

@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express"
-import { AuthService } from "../services/"
-import { joiError, successResponse } from "../utils/"
+import { AuthService } from "../services"
+import { joiError, prisma, successResponse } from "../utils/"
 import { decrypt, encrypt } from "../utils/bcrypt"
 import { signJwt } from "../utils/jwt"
 import { logger } from "../utils/logger"
@@ -32,12 +32,12 @@ export class AuthController {
 
       const user = await this.authService.Login(payload.email)
       if (!user) {
-        throw next(new ErrorAuth("Error login", "Email not registered"))
+        return res.status(422).send({ status: false, statusCode: 422, message: "Email not registered" })
       }
 
       const matching_password = decrypt(payload.password, user.password)
       if (!matching_password) {
-        throw next(new ErrorAuth("Error login", "Password not match"))
+        return res.status(422).send({ status: false, statusCode: 422, message: "Password not match" })
       }
 
       const access_token = signJwt({ ...user }, { expiresIn: "1d" })
@@ -49,7 +49,10 @@ export class AuthController {
 
       return res.cookie("accessToken", access_token).send(send_user)
     } catch (error: any) {
+      logger.error(`ERR: auth - login = ${error}`)
       next(error)
     }
   }
+
+  public async LogOut(req: Request, res: Response, next: NextFunction) {}
 }
