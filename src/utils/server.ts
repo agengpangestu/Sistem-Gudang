@@ -15,8 +15,8 @@ const createServer = () => {
     cors({
       origin: ["http://localhost:3000"],
       credentials: true,
-      methods: ["GET", "POST", "PUT", "DELETE"]
-    })
+      methods: ["GET", "POST", "PUT", "DELETE"],
+    }),
   )
   app.use((req, res, next) => {
     res.setHeader("Access-Control-Allow-Origin", "http://localhost:3000")
