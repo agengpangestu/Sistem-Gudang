@@ -1,9 +1,6 @@
 import Joi from "joi"
-import { ProductStore, ProductType } from "../types/product.type"
 
 export const ProductValidation = Joi.object({
-  // product_id: Joi.string().required(),
-  product_code: Joi.number().required(),
   product_name: Joi.string().required(),
   desc: Joi.string(),
   location: Joi.string().required(),
