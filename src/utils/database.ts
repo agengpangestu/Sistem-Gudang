@@ -1,4 +1,4 @@
-import { Kysely, PostgresDialect } from "kysely/dist/cjs"
+import { Kysely, PostgresDialect } from "kysely"
 import { Pool } from "pg"
 import { CONFIG } from "../config"
 import { DB } from "../db/types"
