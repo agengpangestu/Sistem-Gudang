@@ -23,10 +23,7 @@ export const Login = async (req: Request, res: Response, next: NextFunction): Pr
   try {
     const payload = req.body as AuthLogin
 
-    const user = await LoginService(payload.email)
-    if (!user) {
-      return res.status(422).send({ status: false, statusCode: 422, message: "Email not registered" })
-    }
+    const user = (await LoginService(payload.email)) as AuthLogin
 
     const matching_password = decrypt(payload.password, user.password)
     if (!matching_password) {

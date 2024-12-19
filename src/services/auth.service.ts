@@ -1,6 +1,6 @@
-import { PrismaClientKnownRequestError, PrismaClientValidationError } from "@prisma/client/runtime/library"
+import { NoResultError } from "kysely"
 import { v7 as uuidV7 } from "uuid"
-import DatabaseErrorConstraint from "../helpers/database"
+import DatabaseErrorConstraint, { DatabaseNotFound } from "../helpers/database"
 import { AuthLogin, AuthRegister } from "../types/"
 import { db } from "../utils"
 
@@ -25,23 +25,13 @@ export const RegisterService = async (payload: AuthRegister): Promise<AuthRegist
       })
       .returning(["id", "name", "email", "password", "role", "createdAt", "updatedAt"])
       .executeTakeFirstOrThrow()
-    // this.prisma.users.create({ data: { ...payload, user_id: uuidV7() } })
     return register
-  } catch (error: any) {
-    if (error.code === "23505" && error.constraint === "User_email_key") {
-      throw new DatabaseErrorConstraint("Unique Constraint", "Error Database", "Email has been registered")
+  } catch (error: unknown) {
+    if (typeof error === "object" && error !== null && "code" in error && "constraint" in error) {
+      if (error.code === "23505" && error.constraint === "User_email_key") {
+        throw new DatabaseErrorConstraint("Database Error", "Bad Request", "Email has been registered")
+      }
     }
-    // if (error instanceof PrismaClientValidationError) {
-    //   const err = error.name
-    //   throw new DatabaseErrorConstraint(err, "Error Database", "Role doesn't exist")
-    // }
-    // if (error instanceof PrismaClientKnownRequestError && error.code === "P2002") {
-    //   if (error) {
-    //     const err = error.meta?.target as any
-    //     const a = err.map((e: any) => e)
-    //     throw new DatabaseErrorConstraint(error.name, "Error Database", `field: '${a}' must unique or registered`)
-    //   }
-    // }
     throw error
   }
 }
@@ -51,7 +41,9 @@ export const LoginService = async (email: string): Promise<AuthLogin | null> => 
     const register = await db.selectFrom("User").selectAll().where("email", "=", email).executeTakeFirstOrThrow()
     return register
   } catch (error) {
-    console.log(error)
+    if (error instanceof NoResultError) {
+      throw new DatabaseNotFound("Database Error", "Not Found", "Email not registered") // fix here
+    }
     throw error
   }
 }

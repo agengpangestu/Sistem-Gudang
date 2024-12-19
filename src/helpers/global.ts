@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express"
-import DatabaseErrorConstraint from "./database"
+import DatabaseErrorConstraint, { DatabaseNotFound } from "./database"
 import ErrorAuth from "./error.auth"
 import ErrorValidation from "./error.validation"
 import JoiError from "./joi"
@@ -7,7 +7,7 @@ import ErrorNotFound from "./not.found"
 import Unauthorized from "./unauthorized"
 
 export const GlobalError = (err: any, req: Request, res: Response, next: NextFunction) => {
-  console.log(err)
+  // console.log(err)
 
   if (err.code === "ENOTFOUND" && err.syscall === "getaddrinfo") {
     return res.status(503).json({
@@ -38,21 +38,27 @@ export const GlobalError = (err: any, req: Request, res: Response, next: NextFun
       details: err.details,
       statusCode: 422,
     })
+  } else if (err instanceof DatabaseErrorConstraint) {
+    return res.status(409).json({
+      status: false,
+      message: err.message.replace(/\"/g, ""),
+      statusCode: 409,
+      error: err.error,
+    })
+  } else if (err instanceof DatabaseNotFound) {
+    return res.status(400).json({
+      status: false,
+      message: err.message.replace(/\"/g, ""),
+      statusCode: 400,
+      error: err.error,
+    })
   } else if (err instanceof Error) {
     return res.status(400).json({
       status: false,
       name: err.name,
-      message: err.message,
+      message: "Bad Request",
       statusCode: 400,
-    })
-  } 
-  else if (err instanceof DatabaseErrorConstraint) {
-    return res.status(422).json({
-      status: false,
-      name: err.name,
-      message: err.message.replace(/\"/g, ""),
-      statusCode: 422,
-      error: err.error,
+      error: err.message,
     })
   } else if (err instanceof ErrorValidation) {
     return res.status(422).json({
