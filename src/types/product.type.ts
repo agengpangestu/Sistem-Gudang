@@ -1,7 +1,6 @@
 import { Decimal } from "@prisma/client/runtime/library"
-import { QueryType } from "./query.type"
 import { PaginationType } from "./pagination.type"
-import { number } from "joi/lib"
+import { QueryType } from "./query.type"
 
 export interface ProductType extends ProductPagination {
   id: number
@@ -38,19 +37,17 @@ export interface ProductPaginationResponse {
 }
 
 export interface Product {
-  product_id: string
-  product_code: number
+  id: string
   product_name: string
   location: string
   price: number
   createdAt: Date
+  updatedAt: Date
 }
 
 export interface ProductDetail extends Partial<Product> {
-  id: number
   desc: string
-  user_id: number
-  updatedAt: Date
+  user_id: string
 }
 
 export interface ProductQuery extends QueryType, PaginationType {
@@ -58,18 +55,20 @@ export interface ProductQuery extends QueryType, PaginationType {
 }
 
 export interface ProductStore {
-  product_id: string
-  product_code: number
   product_name: string
   desc: string
   location: string
   price: number
-  user_id: number 
+  user_id: string
 }
 
 export interface ProductUpdate {
-  product_name: string
-  desc: string
-  location: string
-  price: number
+  product_name?: string
+  desc?: string
+  location?: string
+  price?: number
+}
+
+export interface DB {
+  Product: Product
 }
