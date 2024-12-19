@@ -42,6 +42,8 @@ export const Login = async (req: Request, res: Response, next: NextFunction): Pr
     logger.error(`ERR: auth - login = ${error}`)
     next(error)
   }
+
+  public async LogOut(req: Request, res: Response, next: NextFunction) {}
 }
 
 export const LogOut = async (req: Request, res: Response, next: NextFunction) => {}
