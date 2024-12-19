@@ -1,8 +1,8 @@
 import { Prisma } from "@prisma/client"
 
 class DatabaseErrorConstraint extends Prisma.PrismaClientKnownRequestError {
-  error: any
-  constructor(name: string, message: any, error: any) {
+  error: string
+  constructor(name: string, message: any, error: string) {
     super(name, message)
     this.name = name
     this.message = message
